@@ -234,6 +234,80 @@
     font-weight: 500;
   }
 
+  /* Auth screen */
+  .auth-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+
+  .auth-overlay.hidden { display: none; }
+
+  .auth-box {
+    text-align: center;
+    padding: 32px 24px;
+    max-width: 340px;
+    width: 100%;
+  }
+
+  .auth-box h1 {
+    font-size: 1.5rem;
+    margin-bottom: 6px;
+  }
+
+  .auth-box h1 span { color: var(--accent); }
+
+  .auth-box p {
+    color: var(--text2);
+    font-size: 0.85rem;
+    margin-bottom: 24px;
+  }
+
+  .auth-box input[type="password"] {
+    width: 100%;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    padding: 14px;
+    font-size: 1.05rem;
+    font-family: inherit;
+    outline: none;
+    text-align: center;
+    margin-bottom: 12px;
+    transition: border-color 0.2s;
+  }
+
+  .auth-box input[type="password"]:focus {
+    border-color: var(--accent);
+  }
+
+  .auth-box .auth-btn {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+  }
+
+  .auth-error {
+    color: var(--danger);
+    font-size: 0.82rem;
+    margin-top: 10px;
+    min-height: 1.2em;
+  }
+
+  .app-content.locked { display: none; }
+
   .error-msg {
     color: var(--danger);
     font-size: 0.82rem;
@@ -302,7 +376,18 @@
 </style>
 </head>
 <body>
-<div class="container">
+
+<div class="auth-overlay" id="auth-overlay">
+  <div class="auth-box">
+    <h1><span>Wind</span>Wizard</h1>
+    <p>Введіть пароль для доступу</p>
+    <input type="password" id="auth-password" placeholder="Пароль" autocomplete="off">
+    <button class="auth-btn" id="auth-btn">Увійти</button>
+    <div class="auth-error" id="auth-error"></div>
+  </div>
+</div>
+
+<div class="container app-content locked" id="app-content">
   <header>
     <h1><span>Wind</span>Wizard</h1>
     <p>Розрахунок вітру для БПЛА</p>
@@ -398,6 +483,48 @@
 <script>
 (function() {
   const $ = id => document.getElementById(id);
+
+  // --- Auth ---
+  // SHA-256 hash of the password "windwizard" (default — change hash to use a different password)
+  // To generate a new hash: open browser console and run:
+  //   crypto.subtle.digest('SHA-256', new TextEncoder().encode('YOUR_PASSWORD')).then(b => console.log([...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')))
+  const PASS_HASH = 'b23bb775a7e9ace2dfa9ee4a9edc1d00591aeab93a8e94f9b9297e43eff0ef07';
+
+  async function sha256(text) {
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+    return [...new Uint8Array(buf)].map(x => x.toString(16).padStart(2, '0')).join('');
+  }
+
+  function unlockApp() {
+    $('auth-overlay').classList.add('hidden');
+    $('app-content').classList.remove('locked');
+  }
+
+  // Check session
+  if (sessionStorage.getItem('ww_auth') === '1') {
+    unlockApp();
+  }
+
+  async function tryAuth() {
+    const pwd = $('auth-password').value;
+    if (!pwd) return;
+    const hash = await sha256(pwd);
+    if (hash === PASS_HASH) {
+      sessionStorage.setItem('ww_auth', '1');
+      unlockApp();
+    } else {
+      $('auth-error').textContent = 'Невірний пароль';
+      $('auth-password').value = '';
+      $('auth-password').focus();
+    }
+  }
+
+  $('auth-btn').addEventListener('click', tryAuth);
+  $('auth-password').addEventListener('keydown', e => {
+    if (e.key === 'Enter') tryAuth();
+  });
+
+  // --- Main app ---
 
   // Tabs
   document.querySelectorAll('.tab').forEach(tab => {
