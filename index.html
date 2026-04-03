@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>WindWizard — Розрахунок вітру для БПЛА</title>
+<style>
+  :root {
+    --bg: #0f1923;
+    --card: #1a2733;
+    --border: #2a3f50;
+    --accent: #00b4d8;
+    --accent2: #0077b6;
+    --text: #e0e6ed;
+    --text2: #8899a6;
+    --danger: #e63946;
+    --success: #2a9d8f;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    min-height: 100dvh;
+    line-height: 1.5;
+  }
+
+  .container {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 16px;
+  }
+
+  header {
+    text-align: center;
+    padding: 20px 0 12px;
+  }
+
+  header h1 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  header h1 span { color: var(--accent); }
+
+  header p {
+    color: var(--text2);
+    font-size: 0.82rem;
+    margin-top: 4px;
+  }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px;
+    margin-bottom: 14px;
+  }
+
+  .card-title {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text2);
+    margin-bottom: 14px;
+    font-weight: 600;
+  }
+
+  .input-group {
+    margin-bottom: 14px;
+  }
+
+  .input-group:last-child {
+    margin-bottom: 0;
+  }
+
+  label {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--text);
+    margin-bottom: 6px;
+    font-weight: 500;
+  }
+
+  label small {
+    color: var(--text2);
+    font-weight: 400;
+  }
+
+  input[type="number"] {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    padding: 12px 14px;
+    font-size: 1.05rem;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s;
+    -moz-appearance: textfield;
+  }
+
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+  }
+
+  input[type="number"]:focus {
+    border-color: var(--accent);
+  }
+
+  input[type="number"]::placeholder {
+    color: #4a5f70;
+  }
+
+  .row {
+    display: flex;
+    gap: 12px;
+  }
+
+  .row .input-group {
+    flex: 1;
+  }
+
+  button.calc-btn {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.1s;
+    margin-bottom: 14px;
+  }
+
+  button.calc-btn:active {
+    transform: scale(0.98);
+    opacity: 0.9;
+  }
+
+  .result {
+    display: none;
+  }
+
+  .result.visible {
+    display: block;
+  }
+
+  .result-main {
+    text-align: center;
+    padding: 8px 0 14px;
+  }
+
+  .result-value {
+    font-size: 2.8rem;
+    font-weight: 700;
+    color: var(--accent);
+    line-height: 1.1;
+  }
+
+  .result-unit {
+    font-size: 0.95rem;
+    color: var(--text2);
+    margin-top: 2px;
+  }
+
+  .result-label {
+    font-size: 0.82rem;
+    color: var(--text2);
+    margin-top: 6px;
+  }
+
+  .result-details {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 14px;
+  }
+
+  .detail-box {
+    background: var(--bg);
+    border-radius: 8px;
+    padding: 12px;
+    text-align: center;
+  }
+
+  .detail-box.full-width {
+    grid-column: 1 / -1;
+  }
+
+  .detail-val {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .detail-label {
+    font-size: 0.72rem;
+    color: var(--text2);
+    margin-top: 2px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .wind-indicator {
+    position: relative;
+    width: 140px;
+    height: 140px;
+    margin: 10px auto;
+  }
+
+  .wind-indicator canvas {
+    width: 100%;
+    height: 100%;
+  }
+
+  .info-card {
+    font-size: 0.8rem;
+    color: var(--text2);
+    line-height: 1.6;
+  }
+
+  .info-card b {
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  .error-msg {
+    color: var(--danger);
+    font-size: 0.82rem;
+    text-align: center;
+    padding: 8px 0;
+    display: none;
+  }
+
+  .beaufort-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-top: 6px;
+  }
+
+  .beaufort-0 { background: #264653; color: #2a9d8f; }
+  .beaufort-1 { background: #264653; color: #2a9d8f; }
+  .beaufort-2 { background: #1a4a3a; color: #52b788; }
+  .beaufort-3 { background: #2a4a30; color: #80c060; }
+  .beaufort-4 { background: #4a4a20; color: #c0c040; }
+  .beaufort-5 { background: #4a3a1a; color: #e0a030; }
+  .beaufort-6 { background: #4a2a1a; color: #e07030; }
+  .beaufort-7 { background: #4a1a1a; color: #e04040; }
+
+  .tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 14px;
+    background: var(--bg);
+    border-radius: 10px;
+    padding: 3px;
+  }
+
+  .tab {
+    flex: 1;
+    padding: 9px 8px;
+    text-align: center;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--text2);
+    border: none;
+    background: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+  }
+
+  .tab.active {
+    background: var(--card);
+    color: var(--text);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  }
+
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  @media (min-width: 600px) {
+    .container { padding: 24px; }
+    header { padding: 32px 0 16px; }
+    header h1 { font-size: 1.6rem; }
+    .result-value { font-size: 3.2rem; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1><span>Wind</span>Wizard</h1>
+    <p>Розрахунок вітру для БПЛА</p>
+  </header>
+
+  <div class="card">
+    <div class="card-title">Вхідні дані</div>
+
+    <div class="input-group">
+      <label>Повітряна швидкість <small>(м/с)</small></label>
+      <input type="number" id="airspeed" inputmode="decimal" placeholder="напр. 25" step="any" min="0">
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" data-tab="offset">Зміщення (м)</button>
+      <button class="tab" data-tab="angle">Кут зносу (&deg;)</button>
+    </div>
+
+    <div id="tab-offset" class="tab-content active">
+      <div class="row">
+        <div class="input-group">
+          <label>Зміщення <small>(м)</small></label>
+          <input type="number" id="displacement" inputmode="decimal" placeholder="напр. 50" step="any" min="0">
+        </div>
+        <div class="input-group">
+          <label>Час <small>(сек)</small></label>
+          <input type="number" id="time" inputmode="decimal" placeholder="напр. 30" step="any" min="0">
+        </div>
+      </div>
+    </div>
+
+    <div id="tab-angle" class="tab-content">
+      <div class="input-group">
+        <label>Кут зносу <small>(градуси)</small></label>
+        <input type="number" id="drift-angle" inputmode="decimal" placeholder="напр. 5" step="any" min="0" max="90">
+      </div>
+    </div>
+  </div>
+
+  <button class="calc-btn" id="calc-btn">Розрахувати вітер</button>
+
+  <div class="error-msg" id="error"></div>
+
+  <div class="result" id="result">
+    <div class="card">
+      <div class="card-title">Результат — бокова складова вітру</div>
+      <div class="result-main">
+        <div class="wind-indicator">
+          <canvas id="wind-canvas" width="280" height="280"></canvas>
+        </div>
+        <div class="result-value" id="wind-speed">—</div>
+        <div class="result-unit">м/с</div>
+        <div id="beaufort-container"></div>
+      </div>
+
+      <div class="result-details">
+        <div class="detail-box">
+          <div class="detail-val" id="wind-kmh">—</div>
+          <div class="detail-label">км/год</div>
+        </div>
+        <div class="detail-box">
+          <div class="detail-val" id="wind-knots">—</div>
+          <div class="detail-label">вузли</div>
+        </div>
+        <div class="detail-box">
+          <div class="detail-val" id="drift-rate">—</div>
+          <div class="detail-label">швидкість зносу м/с</div>
+        </div>
+        <div class="detail-box">
+          <div class="detail-val" id="drift-angle-result">—</div>
+          <div class="detail-label">кут зносу</div>
+        </div>
+        <div class="detail-box full-width">
+          <div class="detail-val" id="correction-hint">—</div>
+          <div class="detail-label">рекомендація</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card info-card">
+    <div class="card-title">Як використовувати</div>
+    <p>
+      <b>1.</b> Введіть повітряну швидкість БПЛА (TAS).<br>
+      <b>2.</b> Оберіть спосіб введення зносу:<br>
+      &nbsp;&nbsp;&bull; <b>Зміщення</b> — на скільки метрів літак зійшов з курсу ІНС і за який час.<br>
+      &nbsp;&nbsp;&bull; <b>Кут зносу</b> — якщо відомий кут між курсом і фактичним напрямком руху.<br>
+      <b>3.</b> Натисніть "Розрахувати" — отримаєте бокову складову вітру.
+    </p>
+  </div>
+</div>
+
+<script>
+(function() {
+  const $ = id => document.getElementById(id);
+
+  // Tabs
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      tab.classList.add('active');
+      $('tab-' + tab.dataset.tab).classList.add('active');
+    });
+  });
+
+  // Beaufort scale for crosswind
+  function getBeaufort(ms) {
+    const scale = [
+      [0.3, 0, 'Штиль'],
+      [1.5, 1, 'Тихий'],
+      [3.3, 2, 'Легкий'],
+      [5.5, 3, 'Слабкий'],
+      [8.0, 4, 'Помірний'],
+      [10.8, 5, 'Свіжий'],
+      [13.9, 6, 'Сильний'],
+      [Infinity, 7, 'Дуже сильний']
+    ];
+    for (const [limit, num, name] of scale) {
+      if (ms < limit) return { num, name };
+    }
+  }
+
+  function showError(msg) {
+    const el = $('error');
+    el.textContent = msg;
+    el.style.display = 'block';
+    $('result').classList.remove('visible');
+  }
+
+  function clearError() {
+    $('error').style.display = 'none';
+  }
+
+  function drawWindIndicator(angleDeg, strength) {
+    const canvas = $('wind-canvas');
+    const ctx = canvas.getContext('2d');
+    const w = canvas.width;
+    const h = canvas.height;
+    const cx = w / 2;
+    const cy = h / 2;
+    const r = 120;
+
+    ctx.clearRect(0, 0, w, h);
+
+    // Background circle
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    ctx.fillStyle = '#0f1923';
+    ctx.fill();
+    ctx.strokeStyle = '#2a3f50';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Cross lines
+    ctx.strokeStyle = '#1e3040';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy - r + 10);
+    ctx.lineTo(cx, cy + r - 10);
+    ctx.moveTo(cx - r + 10, cy);
+    ctx.lineTo(cx + r - 10, cy);
+    ctx.stroke();
+
+    // Course arrow (up)
+    ctx.strokeStyle = '#4a6a7a';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy + 40);
+    ctx.lineTo(cx, cy - 60);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(cx, cy - 60);
+    ctx.lineTo(cx - 8, cy - 45);
+    ctx.moveTo(cx, cy - 60);
+    ctx.lineTo(cx + 8, cy - 45);
+    ctx.stroke();
+
+    // Course label
+    ctx.fillStyle = '#4a6a7a';
+    ctx.font = '500 11px -apple-system, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('КУРС', cx, cy + 58);
+
+    // Wind arrow
+    const angleRad = angleDeg * Math.PI / 180;
+    const arrowLen = 30 + Math.min(strength * 4, 60);
+    const wx = cx + Math.sin(angleRad) * arrowLen;
+    const wy = cy - Math.cos(angleRad) * arrowLen;
+
+    ctx.strokeStyle = '#00b4d8';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(wx, wy);
+    ctx.stroke();
+
+    // Arrow head
+    const headLen = 12;
+    const headAngle = Math.atan2(wy - cy, wx - cx);
+    ctx.beginPath();
+    ctx.moveTo(wx, wy);
+    ctx.lineTo(
+      wx - headLen * Math.cos(headAngle - 0.4),
+      wy - headLen * Math.sin(headAngle - 0.4)
+    );
+    ctx.moveTo(wx, wy);
+    ctx.lineTo(
+      wx - headLen * Math.cos(headAngle + 0.4),
+      wy - headLen * Math.sin(headAngle + 0.4)
+    );
+    ctx.stroke();
+
+    // Wind label
+    ctx.fillStyle = '#00b4d8';
+    ctx.font = '600 11px -apple-system, sans-serif';
+    const labelX = cx + Math.sin(angleRad) * (arrowLen + 18);
+    const labelY = cy - Math.cos(angleRad) * (arrowLen + 18);
+    ctx.fillText('ВІТЕР', labelX, labelY);
+  }
+
+  function calculate() {
+    clearError();
+
+    const airspeed = parseFloat($('airspeed').value);
+    if (!airspeed || airspeed <= 0) {
+      showError('Введіть повітряну швидкість');
+      return;
+    }
+
+    const isOffsetMode = document.querySelector('.tab.active').dataset.tab === 'offset';
+    let crosswind, angleDeg;
+
+    if (isOffsetMode) {
+      const disp = parseFloat($('displacement').value);
+      const time = parseFloat($('time').value);
+
+      if (!disp || disp < 0) { showError('Введіть зміщення'); return; }
+      if (!time || time <= 0) { showError('Введіть час'); return; }
+
+      crosswind = disp / time;
+      angleDeg = Math.atan2(crosswind, airspeed) * (180 / Math.PI);
+    } else {
+      angleDeg = parseFloat($('drift-angle').value);
+      if (isNaN(angleDeg) || angleDeg < 0) { showError('Введіть кут зносу'); return; }
+      if (angleDeg >= 90) { showError('Кут зносу повинен бути менше 90°'); return; }
+
+      crosswind = airspeed * Math.tan(angleDeg * Math.PI / 180);
+    }
+
+    // Display results
+    $('result').classList.add('visible');
+
+    const windMs = crosswind;
+    const windKmh = windMs * 3.6;
+    const windKnots = windMs * 1.944;
+
+    $('wind-speed').textContent = windMs.toFixed(1);
+    $('wind-kmh').textContent = windKmh.toFixed(1);
+    $('wind-knots').textContent = windKnots.toFixed(1);
+    $('drift-rate').textContent = crosswind.toFixed(2);
+    $('drift-angle-result').textContent = angleDeg.toFixed(1) + '°';
+
+    // Beaufort
+    const bf = getBeaufort(windMs);
+    $('beaufort-container').innerHTML =
+      `<span class="beaufort-badge beaufort-${bf.num}">${bf.name} (${bf.num} бал.)</span>`;
+
+    // Correction hint
+    let hint;
+    if (windMs < 1) hint = 'Корекція не потрібна';
+    else if (windMs < 3) hint = 'Незначна корекція курсу';
+    else if (windMs < 6) hint = 'Враховуйте знос при навігації';
+    else if (windMs < 10) hint = 'Значний вплив — корегуйте курс';
+    else hint = 'Небезпечний вітер для малих БПЛА';
+
+    $('correction-hint').textContent = hint;
+
+    // Draw indicator — show wind coming from 90° (side)
+    drawWindIndicator(90, windMs);
+
+    // Scroll to result on mobile
+    $('result').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  $('calc-btn').addEventListener('click', calculate);
+
+  // Enter key triggers calculation
+  document.querySelectorAll('input').forEach(inp => {
+    inp.addEventListener('keydown', e => {
+      if (e.key === 'Enter') calculate();
+    });
+  });
+})();
+</script>
+</body>
+</html>
