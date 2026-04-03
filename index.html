@@ -5,724 +5,283 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>WindWizard — Розрахунок вітру для БПЛА</title>
 <style>
-  :root {
-    --bg: #0f1923;
-    --card: #1a2733;
-    --border: #2a3f50;
-    --accent: #00b4d8;
-    --accent2: #0077b6;
-    --text: #e0e6ed;
-    --text2: #8899a6;
-    --danger: #e63946;
-    --success: #2a9d8f;
-  }
-
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    min-height: 100dvh;
-    line-height: 1.5;
-  }
-
-  .container {
-    max-width: 480px;
-    margin: 0 auto;
-    padding: 16px;
-  }
-
-  header {
-    text-align: center;
-    padding: 20px 0 12px;
-  }
-
-  header h1 {
-    font-size: 1.4rem;
-    font-weight: 700;
-    letter-spacing: -0.02em;
-  }
-
-  header h1 span { color: var(--accent); }
-
-  header p {
-    color: var(--text2);
-    font-size: 0.82rem;
-    margin-top: 4px;
-  }
-
-  .card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 18px;
-    margin-bottom: 14px;
-  }
-
-  .card-title {
-    font-size: 0.78rem;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--text2);
-    margin-bottom: 14px;
-    font-weight: 600;
-  }
-
-  .input-group {
-    margin-bottom: 14px;
-  }
-
-  .input-group:last-child {
-    margin-bottom: 0;
-  }
-
-  label {
-    display: block;
-    font-size: 0.85rem;
-    color: var(--text);
-    margin-bottom: 6px;
-    font-weight: 500;
-  }
-
-  label small {
-    color: var(--text2);
-    font-weight: 400;
-  }
-
-  input[type="number"] {
-    width: 100%;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    color: var(--text);
-    padding: 12px 14px;
-    font-size: 1.05rem;
-    font-family: inherit;
-    outline: none;
-    transition: border-color 0.2s;
-    -moz-appearance: textfield;
-  }
-
-  input[type="number"]::-webkit-inner-spin-button,
-  input[type="number"]::-webkit-outer-spin-button {
-    -webkit-appearance: none;
-  }
-
-  input[type="number"]:focus {
-    border-color: var(--accent);
-  }
-
-  input[type="number"]::placeholder {
-    color: #4a5f70;
-  }
-
-  .row {
-    display: flex;
-    gap: 12px;
-  }
-
-  .row .input-group {
-    flex: 1;
-  }
-
-  button.calc-btn {
-    width: 100%;
-    padding: 14px;
-    background: linear-gradient(135deg, var(--accent2), var(--accent));
-    color: #fff;
-    border: none;
-    border-radius: 10px;
-    font-size: 1rem;
-    font-weight: 600;
-    font-family: inherit;
-    cursor: pointer;
-    transition: opacity 0.2s, transform 0.1s;
-    margin-bottom: 14px;
-  }
-
-  button.calc-btn:active {
-    transform: scale(0.98);
-    opacity: 0.9;
-  }
-
-  .result {
-    display: none;
-  }
-
-  .result.visible {
-    display: block;
-  }
-
-  .result-main {
-    text-align: center;
-    padding: 8px 0 14px;
-  }
-
-  .result-value {
-    font-size: 2.8rem;
-    font-weight: 700;
-    color: var(--accent);
-    line-height: 1.1;
-  }
-
-  .result-unit {
-    font-size: 0.95rem;
-    color: var(--text2);
-    margin-top: 2px;
-  }
-
-  .result-label {
-    font-size: 0.82rem;
-    color: var(--text2);
-    margin-top: 6px;
-  }
-
-  .result-details {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-top: 14px;
-  }
-
-  .detail-box {
-    background: var(--bg);
-    border-radius: 8px;
-    padding: 12px;
-    text-align: center;
-  }
-
-  .detail-box.full-width {
-    grid-column: 1 / -1;
-  }
-
-  .detail-val {
-    font-size: 1.3rem;
-    font-weight: 700;
-    color: var(--text);
-  }
-
-  .detail-label {
-    font-size: 0.72rem;
-    color: var(--text2);
-    margin-top: 2px;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-  }
-
-  .wind-indicator {
-    position: relative;
-    width: 140px;
-    height: 140px;
-    margin: 10px auto;
-  }
-
-  .wind-indicator canvas {
-    width: 100%;
-    height: 100%;
-  }
-
-  .info-card {
-    font-size: 0.8rem;
-    color: var(--text2);
-    line-height: 1.6;
-  }
-
-  .info-card b {
-    color: var(--text);
-    font-weight: 500;
-  }
-
-  /* Auth screen */
-  .auth-overlay {
-    position: fixed;
-    inset: 0;
-    background: var(--bg);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-  }
-
-  .auth-overlay.hidden { display: none; }
-
-  .auth-box {
-    text-align: center;
-    padding: 32px 24px;
-    max-width: 340px;
-    width: 100%;
-  }
-
-  .auth-box h1 {
-    font-size: 1.5rem;
-    margin-bottom: 6px;
-  }
-
-  .auth-box h1 span { color: var(--accent); }
-
-  .auth-box p {
-    color: var(--text2);
-    font-size: 0.85rem;
-    margin-bottom: 24px;
-  }
-
-  .auth-box input[type="password"] {
-    width: 100%;
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    color: var(--text);
-    padding: 14px;
-    font-size: 1.05rem;
-    font-family: inherit;
-    outline: none;
-    text-align: center;
-    margin-bottom: 12px;
-    transition: border-color 0.2s;
-  }
-
-  .auth-box input[type="password"]:focus {
-    border-color: var(--accent);
-  }
-
-  .auth-box .auth-btn {
-    width: 100%;
-    padding: 14px;
-    background: linear-gradient(135deg, var(--accent2), var(--accent));
-    color: #fff;
-    border: none;
-    border-radius: 10px;
-    font-size: 1rem;
-    font-weight: 600;
-    font-family: inherit;
-    cursor: pointer;
-  }
-
-  .auth-error {
-    color: var(--danger);
-    font-size: 0.82rem;
-    margin-top: 10px;
-    min-height: 1.2em;
-  }
-
-  .app-content.locked { display: none; }
-
-  .error-msg {
-    color: var(--danger);
-    font-size: 0.82rem;
-    text-align: center;
-    padding: 8px 0;
-    display: none;
-  }
-
-  .beaufort-badge {
-    display: inline-block;
-    padding: 3px 10px;
-    border-radius: 20px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    margin-top: 6px;
-  }
-
-  .beaufort-0 { background: #264653; color: #2a9d8f; }
-  .beaufort-1 { background: #264653; color: #2a9d8f; }
-  .beaufort-2 { background: #1a4a3a; color: #52b788; }
-  .beaufort-3 { background: #2a4a30; color: #80c060; }
-  .beaufort-4 { background: #4a4a20; color: #c0c040; }
-  .beaufort-5 { background: #4a3a1a; color: #e0a030; }
-  .beaufort-6 { background: #4a2a1a; color: #e07030; }
-  .beaufort-7 { background: #4a1a1a; color: #e04040; }
-
-  .tabs {
-    display: flex;
-    gap: 4px;
-    margin-bottom: 14px;
-    background: var(--bg);
-    border-radius: 10px;
-    padding: 3px;
-  }
-
-  .tab {
-    flex: 1;
-    padding: 9px 8px;
-    text-align: center;
-    font-size: 0.82rem;
-    font-weight: 500;
-    color: var(--text2);
-    border: none;
-    background: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-family: inherit;
-    transition: all 0.2s;
-  }
-
-  .tab.active {
-    background: var(--card);
-    color: var(--text);
-    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
-  }
-
-  .tab-content { display: none; }
-  .tab-content.active { display: block; }
-
-  @media (min-width: 600px) {
-    .container { padding: 24px; }
-    header { padding: 32px 0 16px; }
-    header h1 { font-size: 1.6rem; }
-    .result-value { font-size: 3.2rem; }
-  }
+:root{--bg:#0f1923;--card:#1a2733;--border:#2a3f50;--accent:#00b4d8;--accent2:#0077b6;--text:#e0e6ed;--text2:#8899a6;--danger:#e63946;--success:#2a9d8f;--warn:#e9c46a}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;min-height:100dvh;line-height:1.5}
+.container{max-width:480px;margin:0 auto;padding:16px}
+header{text-align:center;padding:20px 0 12px}
+header h1{font-size:1.4rem;font-weight:700;letter-spacing:-0.02em}
+header h1 span{color:var(--accent)}
+header p{color:var(--text2);font-size:0.82rem;margin-top:4px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:14px}
+.card-title{font-size:0.78rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text2);margin-bottom:14px;font-weight:600}
+.input-group{margin-bottom:14px}
+.input-group:last-child{margin-bottom:0}
+label{display:block;font-size:0.85rem;color:var(--text);margin-bottom:6px;font-weight:500}
+label small{color:var(--text2);font-weight:400}
+input[type="number"]{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:12px 14px;font-size:1.05rem;font-family:inherit;outline:none;transition:border-color 0.2s;-moz-appearance:textfield}
+input[type="number"]::-webkit-inner-spin-button,input[type="number"]::-webkit-outer-spin-button{-webkit-appearance:none}
+input[type="number"]:focus{border-color:var(--accent)}
+input[type="number"]::placeholder{color:#4a5f70}
+.row{display:flex;gap:12px}
+.row .input-group{flex:1}
+button.calc-btn{width:100%;padding:14px;background:linear-gradient(135deg,var(--accent2),var(--accent));color:#fff;border:none;border-radius:10px;font-size:1rem;font-weight:600;font-family:inherit;cursor:pointer;transition:opacity 0.2s,transform 0.1s;margin-bottom:14px}
+button.calc-btn:active{transform:scale(0.98);opacity:0.9}
+.result{display:none}
+.result.visible{display:block}
+.result-main{text-align:center;padding:8px 0 14px}
+.result-value{font-size:2.8rem;font-weight:700;color:var(--accent);line-height:1.1}
+.result-unit{font-size:0.95rem;color:var(--text2);margin-top:2px}
+.result-details{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.detail-box{background:var(--bg);border-radius:8px;padding:12px;text-align:center}
+.detail-box.full-width{grid-column:1/-1}
+.detail-val{font-size:1.3rem;font-weight:700;color:var(--text)}
+.detail-label{font-size:0.72rem;color:var(--text2);margin-top:2px;text-transform:uppercase;letter-spacing:0.04em}
+.wind-indicator{position:relative;width:160px;height:160px;margin:10px auto}
+.wind-indicator canvas{width:100%;height:100%}
+.info-card{font-size:0.8rem;color:var(--text2);line-height:1.6}
+.info-card b{color:var(--text);font-weight:500}
+.auth-overlay{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:1000}
+.auth-overlay.hidden{display:none}
+.auth-box{text-align:center;padding:32px 24px;max-width:340px;width:100%}
+.auth-box h1{font-size:1.5rem;margin-bottom:6px}
+.auth-box h1 span{color:var(--accent)}
+.auth-box p{color:var(--text2);font-size:0.85rem;margin-bottom:24px}
+.auth-box input[type="password"]{width:100%;background:var(--card);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:14px;font-size:1.05rem;font-family:inherit;outline:none;text-align:center;margin-bottom:12px;transition:border-color 0.2s}
+.auth-box input[type="password"]:focus{border-color:var(--accent)}
+.auth-box .auth-btn{width:100%;padding:14px;background:linear-gradient(135deg,var(--accent2),var(--accent));color:#fff;border:none;border-radius:10px;font-size:1rem;font-weight:600;font-family:inherit;cursor:pointer}
+.auth-error{color:var(--danger);font-size:0.82rem;margin-top:10px;min-height:1.2em}
+.app-content.locked{display:none}
+.error-msg{color:var(--danger);font-size:0.82rem;text-align:center;padding:8px 0;display:none}
+.beaufort-badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:0.75rem;font-weight:600;margin-top:6px}
+.beaufort-0,.beaufort-1{background:#264653;color:#2a9d8f}
+.beaufort-2{background:#1a4a3a;color:#52b788}
+.beaufort-3{background:#2a4a30;color:#80c060}
+.beaufort-4{background:#4a4a20;color:#c0c040}
+.beaufort-5{background:#4a3a1a;color:#e0a030}
+.beaufort-6{background:#4a2a1a;color:#e07030}
+.beaufort-7{background:#4a1a1a;color:#e04040}
+.mode-tabs{display:flex;gap:4px;margin-bottom:14px;background:var(--bg);border-radius:10px;padding:3px}
+.mode-tab{flex:1;padding:11px 8px;text-align:center;font-size:0.85rem;font-weight:600;color:var(--text2);border:none;background:none;border-radius:8px;cursor:pointer;font-family:inherit;transition:all 0.2s}
+.mode-tab.active{background:var(--accent2);color:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.3)}
+.mode-content{display:none}
+.mode-content.active{display:block}
+.dir-toggle{display:flex;gap:6px;margin-top:6px}
+.dir-btn{flex:1;padding:10px;text-align:center;font-size:0.85rem;font-weight:500;color:var(--text2);background:var(--bg);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-family:inherit;transition:all 0.2s}
+.dir-btn.active{background:var(--accent2);color:#fff;border-color:var(--accent2)}
+.warn-badge{display:block;padding:8px 12px;border-radius:8px;font-size:0.78rem;font-weight:500;background:#3a3520;color:var(--warn);text-align:center;margin-bottom:14px}
+.wind-from-label{font-size:1.1rem;font-weight:600;color:var(--text);margin-top:4px}
+@media(min-width:600px){.container{padding:24px}header{padding:32px 0 16px}header h1{font-size:1.6rem}.result-value{font-size:3.2rem}}
 </style>
 </head>
 <body>
-
 <div class="auth-overlay" id="auth-overlay">
-  <div class="auth-box">
-    <h1><span>Wind</span>Wizard</h1>
-    <p>Введіть пароль для доступу</p>
-    <input type="password" id="auth-password" placeholder="Пароль" autocomplete="off">
-    <button class="auth-btn" id="auth-btn">Увійти</button>
-    <div class="auth-error" id="auth-error"></div>
-  </div>
+<div class="auth-box">
+<h1><span>Wind</span>Wizard</h1>
+<p>Введіть пароль для доступу</p>
+<input type="password" id="auth-password" placeholder="Пароль" autocomplete="off">
+<button class="auth-btn" id="auth-btn">Увійти</button>
+<div class="auth-error" id="auth-error"></div>
 </div>
-
+</div>
 <div class="container app-content locked" id="app-content">
-  <header>
-    <h1><span>Wind</span>Wizard</h1>
-    <p>Розрахунок вітру для БПЛА</p>
-  </header>
-
-  <div class="card">
-    <div class="card-title">Вхідні дані</div>
-
-    <div class="input-group">
-      <label>Повітряна швидкість <small>(м/с)</small></label>
-      <input type="number" id="airspeed" inputmode="decimal" placeholder="напр. 25" step="any" min="0">
-    </div>
-
-    <div class="tabs">
-      <button class="tab active" data-tab="offset">Зміщення (м)</button>
-      <button class="tab" data-tab="angle">Кут зносу (&deg;)</button>
-    </div>
-
-    <div id="tab-offset" class="tab-content active">
-      <div class="row">
-        <div class="input-group">
-          <label>Зміщення <small>(м)</small></label>
-          <input type="number" id="displacement" inputmode="decimal" placeholder="напр. 50" step="any" min="0">
-        </div>
-        <div class="input-group">
-          <label>Час <small>(сек)</small></label>
-          <input type="number" id="time" inputmode="decimal" placeholder="напр. 30" step="any" min="0">
-        </div>
-      </div>
-    </div>
-
-    <div id="tab-angle" class="tab-content">
-      <div class="input-group">
-        <label>Кут зносу <small>(градуси)</small></label>
-        <input type="number" id="drift-angle" inputmode="decimal" placeholder="напр. 5" step="any" min="0" max="90">
-      </div>
-    </div>
-  </div>
-
-  <button class="calc-btn" id="calc-btn">Розрахувати вітер</button>
-
-  <div class="error-msg" id="error"></div>
-
-  <div class="result" id="result">
-    <div class="card">
-      <div class="card-title">Результат — бокова складова вітру</div>
-      <div class="result-main">
-        <div class="wind-indicator">
-          <canvas id="wind-canvas" width="280" height="280"></canvas>
-        </div>
-        <div class="result-value" id="wind-speed">—</div>
-        <div class="result-unit">м/с</div>
-        <div id="beaufort-container"></div>
-      </div>
-
-      <div class="result-details">
-        <div class="detail-box">
-          <div class="detail-val" id="wind-kmh">—</div>
-          <div class="detail-label">км/год</div>
-        </div>
-        <div class="detail-box">
-          <div class="detail-val" id="wind-knots">—</div>
-          <div class="detail-label">вузли</div>
-        </div>
-        <div class="detail-box">
-          <div class="detail-val" id="drift-rate">—</div>
-          <div class="detail-label">швидкість зносу м/с</div>
-        </div>
-        <div class="detail-box">
-          <div class="detail-val" id="drift-angle-result">—</div>
-          <div class="detail-label">кут зносу</div>
-        </div>
-        <div class="detail-box full-width">
-          <div class="detail-val" id="correction-hint">—</div>
-          <div class="detail-label">рекомендація</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="card info-card">
-    <div class="card-title">Як використовувати</div>
-    <p>
-      <b>1.</b> Введіть повітряну швидкість БПЛА (TAS).<br>
-      <b>2.</b> Оберіть спосіб введення зносу:<br>
-      &nbsp;&nbsp;&bull; <b>Зміщення</b> — на скільки метрів літак зійшов з курсу ІНС і за який час.<br>
-      &nbsp;&nbsp;&bull; <b>Кут зносу</b> — якщо відомий кут між курсом і фактичним напрямком руху.<br>
-      <b>3.</b> Натисніть "Розрахувати" — отримаєте бокову складову вітру.
-    </p>
-  </div>
+<header>
+<h1><span>Wind</span>Wizard</h1>
+<p>Розрахунок вітру для БПЛА</p>
+</header>
+<div class="card">
+<div class="card-title">Режим розрахунку</div>
+<div class="mode-tabs">
+<button class="mode-tab active" data-mode="crosswind">Бокова складова</button>
+<button class="mode-tab" data-mode="fullwind">Повний вектор</button>
 </div>
-
+<div class="input-group">
+<label>Повітряна швидкість (TAS) <small>(м/с)</small></label>
+<input type="number" id="airspeed" inputmode="decimal" placeholder="напр. 25" step="any" min="0">
+</div>
+<div class="input-group">
+<label>Курс (Heading) <small>(градуси)</small></label>
+<input type="number" id="heading" inputmode="decimal" placeholder="напр. 90" step="any" min="0" max="360">
+</div>
+<div id="mode-crosswind" class="mode-content active">
+<div class="row">
+<div class="input-group">
+<label>Зміщення <small>(м)</small></label>
+<input type="number" id="displacement" inputmode="decimal" placeholder="напр. 50" step="any" min="0">
+</div>
+<div class="input-group">
+<label>Час <small>(сек)</small></label>
+<input type="number" id="time" inputmode="decimal" placeholder="напр. 30" step="any" min="0">
+</div>
+</div>
+<div class="input-group">
+<label>Напрямок зносу</label>
+<div class="dir-toggle">
+<button class="dir-btn active" data-dir="right">Вправо</button>
+<button class="dir-btn" data-dir="left">Вліво</button>
+</div>
+</div>
+</div>
+<div id="mode-fullwind" class="mode-content">
+<div class="warn-badge">&#9888; Наближений розрахунок (дані ІНС без GPS)</div>
+<div class="input-group">
+<label>Ground Speed (ІНС) <small>(м/с)</small></label>
+<input type="number" id="gs" inputmode="decimal" placeholder="напр. 22" step="any" min="0">
+</div>
+<div class="input-group">
+<label>Ground Track (ІНС) <small>(градуси)</small></label>
+<input type="number" id="track" inputmode="decimal" placeholder="напр. 95" step="any" min="0" max="360">
+</div>
+</div>
+</div>
+<button class="calc-btn" id="calc-btn">Розрахувати вітер</button>
+<div class="error-msg" id="error"></div>
+<div class="result" id="result">
+<div class="card">
+<div class="card-title" id="result-title">Результат</div>
+<div class="result-main">
+<div class="wind-indicator">
+<canvas id="wind-canvas" width="320" height="320"></canvas>
+</div>
+<div class="result-value" id="wind-speed">—</div>
+<div class="result-unit">м/с</div>
+<div class="wind-from-label" id="wind-from"></div>
+<div id="beaufort-container"></div>
+</div>
+<div class="result-details" id="result-details"></div>
+</div>
+</div>
+<div class="card info-card">
+<div class="card-title">Як використовувати</div>
+<p>
+<b>Бокова складова</b> — точний розрахунок бокового вітру.<br>
+Введіть TAS, курс, зміщення від курсу ІНС (метри) та час. Оберіть напрямок зносу (вправо/вліво).<br><br>
+<b>Повний вектор</b> — наближений розрахунок повного вітру.<br>
+Введіть TAS, курс, Ground Speed та Ground Track з ІНС. Результат наближений через дрейф ІНС (краще на коротких відрізках).<br><br>
+Формула: Вітер = Вектор руху по землі - Вектор руху в повітрі.
+</p>
+</div>
+</div>
 <script>
-(function() {
-  const $ = id => document.getElementById(id);
-
-  // --- Auth ---
-  // SHA-256 hash of the password "windwizard" (default — change hash to use a different password)
-  // To generate a new hash: open browser console and run:
-  //   crypto.subtle.digest('SHA-256', new TextEncoder().encode('YOUR_PASSWORD')).then(b => console.log([...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')))
-  const PASS_HASH = '1cb8e5aeb6ab5f2019eda1f835c834c100c8ad9837d47ad7744f5286842fce58';
-
-  async function sha256(text) {
-    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
-    return [...new Uint8Array(buf)].map(x => x.toString(16).padStart(2, '0')).join('');
-  }
-
-  function unlockApp() {
-    $('auth-overlay').classList.add('hidden');
-    $('app-content').classList.remove('locked');
-  }
-
-  // Check session
-  if (sessionStorage.getItem('ww_auth') === '1') {
-    unlockApp();
-  }
-
-  async function tryAuth() {
-    const pwd = $('auth-password').value;
-    if (!pwd) return;
-    const hash = await sha256(pwd);
-    if (hash === PASS_HASH) {
-      sessionStorage.setItem('ww_auth', '1');
-      unlockApp();
-    } else {
-      $('auth-error').textContent = 'Невірний пароль';
-      $('auth-password').value = '';
-      $('auth-password').focus();
-    }
-  }
-
-  $('auth-btn').addEventListener('click', tryAuth);
-  $('auth-password').addEventListener('keydown', e => {
-    if (e.key === 'Enter') tryAuth();
-  });
-
-  // --- Main app ---
-
-  // Tabs
-  document.querySelectorAll('.tab').forEach(tab => {
-    tab.addEventListener('click', () => {
-      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-      tab.classList.add('active');
-      $('tab-' + tab.dataset.tab).classList.add('active');
-    });
-  });
-
-  // Beaufort scale for crosswind
-  function getBeaufort(ms) {
-    const scale = [
-      [0.3, 0, 'Штиль'],
-      [1.5, 1, 'Тихий'],
-      [3.3, 2, 'Легкий'],
-      [5.5, 3, 'Слабкий'],
-      [8.0, 4, 'Помірний'],
-      [10.8, 5, 'Свіжий'],
-      [13.9, 6, 'Сильний'],
-      [Infinity, 7, 'Дуже сильний']
-    ];
-    for (const [limit, num, name] of scale) {
-      if (ms < limit) return { num, name };
-    }
-  }
-
-  function showError(msg) {
-    const el = $('error');
-    el.textContent = msg;
-    el.style.display = 'block';
-    $('result').classList.remove('visible');
-  }
-
-  function clearError() {
-    $('error').style.display = 'none';
-  }
-
-  function drawWindIndicator(angleDeg, strength) {
-    const canvas = $('wind-canvas');
-    const ctx = canvas.getContext('2d');
-    const w = canvas.width;
-    const h = canvas.height;
-    const cx = w / 2;
-    const cy = h / 2;
-    const r = 120;
-
-    ctx.clearRect(0, 0, w, h);
-
-    // Background circle
-    ctx.beginPath();
-    ctx.arc(cx, cy, r, 0, Math.PI * 2);
-    ctx.fillStyle = '#0f1923';
-    ctx.fill();
-    ctx.strokeStyle = '#2a3f50';
-    ctx.lineWidth = 2;
-    ctx.stroke();
-
-    // Cross lines
-    ctx.strokeStyle = '#1e3040';
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(cx, cy - r + 10);
-    ctx.lineTo(cx, cy + r - 10);
-    ctx.moveTo(cx - r + 10, cy);
-    ctx.lineTo(cx + r - 10, cy);
-    ctx.stroke();
-
-    // Course arrow (up)
-    ctx.strokeStyle = '#4a6a7a';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(cx, cy + 40);
-    ctx.lineTo(cx, cy - 60);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(cx, cy - 60);
-    ctx.lineTo(cx - 8, cy - 45);
-    ctx.moveTo(cx, cy - 60);
-    ctx.lineTo(cx + 8, cy - 45);
-    ctx.stroke();
-
-    // Course label
-    ctx.fillStyle = '#4a6a7a';
-    ctx.font = '500 11px -apple-system, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText('КУРС', cx, cy + 58);
-
-    // Wind arrow
-    const angleRad = angleDeg * Math.PI / 180;
-    const arrowLen = 30 + Math.min(strength * 4, 60);
-    const wx = cx + Math.sin(angleRad) * arrowLen;
-    const wy = cy - Math.cos(angleRad) * arrowLen;
-
-    ctx.strokeStyle = '#00b4d8';
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    ctx.moveTo(cx, cy);
-    ctx.lineTo(wx, wy);
-    ctx.stroke();
-
-    // Arrow head
-    const headLen = 12;
-    const headAngle = Math.atan2(wy - cy, wx - cx);
-    ctx.beginPath();
-    ctx.moveTo(wx, wy);
-    ctx.lineTo(
-      wx - headLen * Math.cos(headAngle - 0.4),
-      wy - headLen * Math.sin(headAngle - 0.4)
-    );
-    ctx.moveTo(wx, wy);
-    ctx.lineTo(
-      wx - headLen * Math.cos(headAngle + 0.4),
-      wy - headLen * Math.sin(headAngle + 0.4)
-    );
-    ctx.stroke();
-
-    // Wind label
-    ctx.fillStyle = '#00b4d8';
-    ctx.font = '600 11px -apple-system, sans-serif';
-    const labelX = cx + Math.sin(angleRad) * (arrowLen + 18);
-    const labelY = cy - Math.cos(angleRad) * (arrowLen + 18);
-    ctx.fillText('ВІТЕР', labelX, labelY);
-  }
-
-  function calculate() {
-    clearError();
-
-    const airspeed = parseFloat($('airspeed').value);
-    if (!airspeed || airspeed <= 0) {
-      showError('Введіть повітряну швидкість');
-      return;
-    }
-
-    const isOffsetMode = document.querySelector('.tab.active').dataset.tab === 'offset';
-    let crosswind, angleDeg;
-
-    if (isOffsetMode) {
-      const disp = parseFloat($('displacement').value);
-      const time = parseFloat($('time').value);
-
-      if (!disp || disp < 0) { showError('Введіть зміщення'); return; }
-      if (!time || time <= 0) { showError('Введіть час'); return; }
-
-      crosswind = disp / time;
-      angleDeg = Math.atan2(crosswind, airspeed) * (180 / Math.PI);
-    } else {
-      angleDeg = parseFloat($('drift-angle').value);
-      if (isNaN(angleDeg) || angleDeg < 0) { showError('Введіть кут зносу'); return; }
-      if (angleDeg >= 90) { showError('Кут зносу повинен бути менше 90°'); return; }
-
-      crosswind = airspeed * Math.tan(angleDeg * Math.PI / 180);
-    }
-
-    // Display results
-    $('result').classList.add('visible');
-
-    const windMs = crosswind;
-    const windKmh = windMs * 3.6;
-    const windKnots = windMs * 1.944;
-
-    $('wind-speed').textContent = windMs.toFixed(1);
-    $('wind-kmh').textContent = windKmh.toFixed(1);
-    $('wind-knots').textContent = windKnots.toFixed(1);
-    $('drift-rate').textContent = crosswind.toFixed(2);
-    $('drift-angle-result').textContent = angleDeg.toFixed(1) + '°';
-
-    // Beaufort
-    const bf = getBeaufort(windMs);
-    $('beaufort-container').innerHTML =
-      `<span class="beaufort-badge beaufort-${bf.num}">${bf.name} (${bf.num} бал.)</span>`;
-
-    // Correction hint
-    let hint;
-    if (windMs < 1) hint = 'Корекція не потрібна';
-    else if (windMs < 3) hint = 'Незначна корекція курсу';
-    else if (windMs < 6) hint = 'Враховуйте знос при навігації';
-    else if (windMs < 10) hint = 'Значний вплив — корегуйте курс';
-    else hint = 'Небезпечний вітер для малих БПЛА';
-
-    $('correction-hint').textContent = hint;
-
-    // Draw indicator — show wind coming from 90° (side)
-    drawWindIndicator(90, windMs);
-
-    // Scroll to result on mobile
-    $('result').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-  }
-
-  $('calc-btn').addEventListener('click', calculate);
-
-  // Enter key triggers calculation
-  document.querySelectorAll('input').forEach(inp => {
-    inp.addEventListener('keydown', e => {
-      if (e.key === 'Enter') calculate();
-    });
-  });
+(function(){
+var $=function(id){return document.getElementById(id)};
+var PASS_HASH='1cb8e5aeb6ab5f2019eda1f835c834c100c8ad9837d47ad7744f5286842fce58';
+function sha256(text){return crypto.subtle.digest('SHA-256',new TextEncoder().encode(text)).then(function(buf){return Array.from(new Uint8Array(buf)).map(function(x){return x.toString(16).padStart(2,'0')}).join('')})}
+function unlockApp(){$('auth-overlay').classList.add('hidden');$('app-content').classList.remove('locked')}
+if(sessionStorage.getItem('ww_auth')==='1')unlockApp();
+function tryAuth(){var pwd=$('auth-password').value;if(!pwd)return;sha256(pwd).then(function(hash){if(hash===PASS_HASH){sessionStorage.setItem('ww_auth','1');unlockApp()}else{$('auth-error').textContent='Невірний пароль';$('auth-password').value='';$('auth-password').focus()}})}
+$('auth-btn').addEventListener('click',tryAuth);
+$('auth-password').addEventListener('keydown',function(e){if(e.key==='Enter')tryAuth()});
+var currentMode='crosswind';
+document.querySelectorAll('.mode-tab').forEach(function(tab){tab.addEventListener('click',function(){document.querySelectorAll('.mode-tab').forEach(function(t){t.classList.remove('active')});document.querySelectorAll('.mode-content').forEach(function(c){c.classList.remove('active')});tab.classList.add('active');currentMode=tab.dataset.mode;$('mode-'+currentMode).classList.add('active');$('result').classList.remove('visible')})});
+document.querySelectorAll('.dir-btn').forEach(function(btn){btn.addEventListener('click',function(){document.querySelectorAll('.dir-btn').forEach(function(b){b.classList.remove('active')});btn.classList.add('active')})});
+function getBeaufort(ms){var scale=[[0.3,0,'Штиль'],[1.5,1,'Тихий'],[3.3,2,'Легкий'],[5.5,3,'Слабкий'],[8.0,4,'Помірний'],[10.8,5,'Свіжий'],[13.9,6,'Сильний'],[Infinity,7,'Дуже сильний']];for(var i=0;i<scale.length;i++){if(ms<scale[i][0])return{num:scale[i][1],name:scale[i][2]}}return{num:7,name:'Дуже сильний'}}
+function compassLabel(deg){var dirs=['Пн','ПнСх','Сх','ПдСх','Пд','ПдЗх','Зх','ПнЗх'];return dirs[Math.round(deg/45)%8]}
+function normDeg(d){return((d%360)+360)%360}
+function degToRad(d){return d*Math.PI/180}
+function showError(msg){$('error').textContent=msg;$('error').style.display='block';$('result').classList.remove('visible')}
+function clearError(){$('error').style.display='none'}
+function drawCompass(headingDeg,windFromDeg,windSpeed,modeIsFull){
+var canvas=$('wind-canvas');var ctx=canvas.getContext('2d');var w=canvas.width;var h=canvas.height;var cx=w/2;var cy=h/2;var r=140;
+ctx.clearRect(0,0,w,h);
+ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.fillStyle='#0f1923';ctx.fill();ctx.strokeStyle='#2a3f50';ctx.lineWidth=2;ctx.stroke();
+ctx.strokeStyle='#1e3040';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(cx,cy-r+10);ctx.lineTo(cx,cy+r-10);ctx.moveTo(cx-r+10,cy);ctx.lineTo(cx+r-10,cy);ctx.stroke();
+var cardinals=[['Пн',0],['Сх',90],['Пд',180],['Зх',270]];
+ctx.font='600 12px -apple-system,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
+for(var i=0;i<cardinals.length;i++){var a=degToRad(cardinals[i][1]);var lx=cx+Math.sin(a)*(r-18);var ly=cy-Math.cos(a)*(r-18);ctx.fillStyle='#4a6a7a';ctx.fillText(cardinals[i][0],lx,ly)}
+var ha=degToRad(headingDeg);var hLen=80;
+ctx.strokeStyle='#4a6a7a';ctx.lineWidth=2.5;ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(cx+Math.sin(ha)*hLen,cy-Math.cos(ha)*hLen);ctx.stroke();
+var hx=cx+Math.sin(ha)*hLen;var hy=cy-Math.cos(ha)*hLen;var hha=Math.atan2(hy-cy,hx-cx);
+ctx.beginPath();ctx.moveTo(hx,hy);ctx.lineTo(hx-10*Math.cos(hha-0.4),hy-10*Math.sin(hha-0.4));ctx.moveTo(hx,hy);ctx.lineTo(hx-10*Math.cos(hha+0.4),hy-10*Math.sin(hha+0.4));ctx.stroke();
+ctx.fillStyle='#4a6a7a';ctx.font='500 10px -apple-system,sans-serif';
+var hlx=cx+Math.sin(ha)*(hLen+16);var hly=cy-Math.cos(ha)*(hLen+16);ctx.fillText('КУРС',hlx,hly);
+var wa=degToRad(windFromDeg+180);
+var arrowLen=35+Math.min(windSpeed*4,55);
+var wx=cx+Math.sin(wa)*arrowLen;var wy=cy-Math.cos(wa)*arrowLen;
+ctx.strokeStyle='#00b4d8';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(wx,wy);ctx.stroke();
+var wha=Math.atan2(wy-cy,wx-cx);
+ctx.beginPath();ctx.moveTo(wx,wy);ctx.lineTo(wx-12*Math.cos(wha-0.4),wy-12*Math.sin(wha-0.4));ctx.moveTo(wx,wy);ctx.lineTo(wx-12*Math.cos(wha+0.4),wy-12*Math.sin(wha+0.4));ctx.stroke();
+ctx.fillStyle='#00b4d8';ctx.font='600 10px -apple-system,sans-serif';
+var wlx=cx+Math.sin(wa)*(arrowLen+16);var wly=cy-Math.cos(wa)*(arrowLen+16);ctx.fillText('ВІТЕР',wlx,wly);
+}
+function calculate(){
+clearError();
+var tas=parseFloat($('airspeed').value);
+if(!tas||tas<=0){showError('Введіть повітряну швидкість');return}
+var hdg=parseFloat($('heading').value);
+if(isNaN(hdg)||hdg<0){showError('Введіть курс');return}
+hdg=normDeg(hdg);
+if(currentMode==='crosswind'){
+var disp=parseFloat($('displacement').value);
+var time=parseFloat($('time').value);
+if(!disp||disp<0){showError('Введіть зміщення');return}
+if(!time||time<=0){showError('Введіть час');return}
+var crosswind=disp/time;
+var driftAngle=Math.atan2(crosswind,tas)*(180/Math.PI);
+var dirRight=document.querySelector('.dir-btn.active').dataset.dir==='right';
+var windFromDeg=dirRight?normDeg(hdg+90):normDeg(hdg-90);
+$('result-title').textContent='Бокова складова вітру';
+$('wind-speed').textContent=crosswind.toFixed(1);
+$('wind-from').textContent='з '+compassLabel(windFromDeg)+' ('+Math.round(windFromDeg)+'\u00B0)';
+var bf=getBeaufort(crosswind);
+$('beaufort-container').innerHTML='<span class="beaufort-badge beaufort-'+bf.num+'">'+bf.name+' ('+bf.num+' бал.)</span>';
+var detailsHtml='<div class="detail-box"><div class="detail-val">'+(crosswind*3.6).toFixed(1)+'</div><div class="detail-label">км/год</div></div>';
+detailsHtml+='<div class="detail-box"><div class="detail-val">'+(crosswind*1.944).toFixed(1)+'</div><div class="detail-label">вузли</div></div>';
+detailsHtml+='<div class="detail-box"><div class="detail-val">'+crosswind.toFixed(2)+'</div><div class="detail-label">швидкість зносу м/с</div></div>';
+detailsHtml+='<div class="detail-box"><div class="detail-val">'+driftAngle.toFixed(1)+'\u00B0</div><div class="detail-label">кут зносу</div></div>';
+var hint;
+if(crosswind<1)hint='Корекція не потрібна';
+else if(crosswind<3)hint='Незначна корекція курсу';
+else if(crosswind<6)hint='Враховуйте знос при навігації';
+else if(crosswind<10)hint='Значний вплив \u2014 корегуйте курс';
+else hint='Небезпечний вітер для малих БПЛА';
+detailsHtml+='<div class="detail-box full-width"><div class="detail-val">'+hint+'</div><div class="detail-label">рекомендація</div></div>';
+$('result-details').innerHTML=detailsHtml;
+drawCompass(hdg,windFromDeg,crosswind,false);
+}else{
+var gs=parseFloat($('gs').value);
+var track=parseFloat($('track').value);
+if(!gs||gs<0){showError('Введіть Ground Speed');return}
+if(isNaN(track)||track<0){showError('Введіть Ground Track');return}
+track=normDeg(track);
+var airX=tas*Math.sin(degToRad(hdg));
+var airY=tas*Math.cos(degToRad(hdg));
+var gndX=gs*Math.sin(degToRad(track));
+var gndY=gs*Math.cos(degToRad(track));
+var windX=gndX-airX;
+var windY=gndY-airY;
+var windSpd=Math.sqrt(windX*windX+windY*windY);
+var windTo=normDeg(Math.atan2(windX,windY)*180/Math.PI);
+var windFrom=normDeg(windTo+180);
+var relWind=degToRad(windFrom-hdg);
+var headwind=windSpd*Math.cos(relWind);
+var crosswindComp=windSpd*Math.sin(relWind);
+$('result-title').textContent='Повний вектор вітру (наближено)';
+$('wind-speed').textContent=windSpd.toFixed(1);
+$('wind-from').textContent='з '+compassLabel(windFrom)+' ('+Math.round(windFrom)+'\u00B0)';
+var bf2=getBeaufort(windSpd);
+$('beaufort-container').innerHTML='<span class="beaufort-badge beaufort-'+bf2.num+'">'+bf2.name+' ('+bf2.num+' бал.)</span>';
+var d2='<div class="detail-box"><div class="detail-val">'+(windSpd*3.6).toFixed(1)+'</div><div class="detail-label">км/год</div></div>';
+d2+='<div class="detail-box"><div class="detail-val">'+(windSpd*1.944).toFixed(1)+'</div><div class="detail-label">вузли</div></div>';
+var hwLabel=headwind>=0?'зустрічний':'попутний';
+d2+='<div class="detail-box"><div class="detail-val">'+Math.abs(headwind).toFixed(1)+'</div><div class="detail-label">'+hwLabel+' м/с</div></div>';
+var cwSide=crosswindComp>=0?'справа':'зліва';
+d2+='<div class="detail-box"><div class="detail-val">'+Math.abs(crosswindComp).toFixed(1)+'</div><div class="detail-label">боковий '+cwSide+' м/с</div></div>';
+var hint2;
+if(windSpd<1)hint2='Вітер мінімальний';
+else if(windSpd<3)hint2='Слабкий вплив на політ';
+else if(windSpd<6)hint2='Помірний вплив \u2014 враховуйте при навігації';
+else if(windSpd<10)hint2='Сильний вплив \u2014 корегуйте курс';
+else hint2='Небезпечний вітер для малих БПЛА';
+d2+='<div class="detail-box full-width"><div class="detail-val">'+hint2+'</div><div class="detail-label">рекомендація</div></div>';
+$('result-details').innerHTML=d2;
+drawCompass(hdg,windFrom,windSpd,true);
+}
+$('result').classList.add('visible');
+$('result').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+$('calc-btn').addEventListener('click',calculate);
+document.querySelectorAll('input[type="number"]').forEach(function(inp){inp.addEventListener('keydown',function(e){if(e.key==='Enter')calculate()})});
 })();
 </script>
 </body>
