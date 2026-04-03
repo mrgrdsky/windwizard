@@ -3,57 +3,39 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>WindWizard — Розрахунок вітру для БПЛА</title>
+<title>WindWizard</title>
 <style>
 :root{--bg:#0f1923;--card:#1a2733;--border:#2a3f50;--accent:#00b4d8;--accent2:#0077b6;--text:#e0e6ed;--text2:#8899a6;--danger:#e63946;--success:#2a9d8f;--warn:#e9c46a}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;min-height:100dvh;line-height:1.5}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100dvh;line-height:1.5;-webkit-user-select:none;user-select:none}
 .container{max-width:480px;margin:0 auto;padding:16px}
-header{text-align:center;padding:20px 0 12px}
-header h1{font-size:1.4rem;font-weight:700;letter-spacing:-0.02em}
+header{text-align:center;padding:16px 0 10px}
+header h1{font-size:1.3rem;font-weight:700}
 header h1 span{color:var(--accent)}
-header p{color:var(--text2);font-size:0.82rem;margin-top:4px}
-.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:14px}
-.card-title{font-size:0.78rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text2);margin-bottom:14px;font-weight:600}
-.input-group{margin-bottom:14px}
-.input-group:last-child{margin-bottom:0}
-label{display:block;font-size:0.85rem;color:var(--text);margin-bottom:6px;font-weight:500}
+header p{color:var(--text2);font-size:0.78rem;margin-top:2px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:12px}
+.card-title{font-size:0.75rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text2);margin-bottom:12px;font-weight:600}
+.input-group{margin-bottom:12px}
+label{display:block;font-size:0.82rem;color:var(--text);margin-bottom:5px;font-weight:500}
 label small{color:var(--text2);font-weight:400}
-input[type="number"]{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:12px 14px;font-size:1.05rem;font-family:inherit;outline:none;transition:border-color 0.2s;-moz-appearance:textfield}
+input[type="number"]{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:11px 12px;font-size:1rem;font-family:inherit;outline:none;-moz-appearance:textfield}
 input[type="number"]::-webkit-inner-spin-button,input[type="number"]::-webkit-outer-spin-button{-webkit-appearance:none}
 input[type="number"]:focus{border-color:var(--accent)}
 input[type="number"]::placeholder{color:#4a5f70}
-.row{display:flex;gap:12px}
+.row{display:flex;gap:10px}
 .row .input-group{flex:1}
-button.calc-btn{width:100%;padding:14px;background:linear-gradient(135deg,var(--accent2),var(--accent));color:#fff;border:none;border-radius:10px;font-size:1rem;font-weight:600;font-family:inherit;cursor:pointer;transition:opacity 0.2s,transform 0.1s;margin-bottom:14px}
-button.calc-btn:active{transform:scale(0.98);opacity:0.9}
-.result{display:none}
-.result.visible{display:block}
-.result-main{text-align:center;padding:8px 0 14px}
-.result-value{font-size:2.8rem;font-weight:700;color:var(--accent);line-height:1.1}
-.result-unit{font-size:0.95rem;color:var(--text2);margin-top:2px}
-.result-details{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
-.detail-box{background:var(--bg);border-radius:8px;padding:12px;text-align:center}
+.calc-btn{width:100%;padding:13px;background:linear-gradient(135deg,var(--accent2),var(--accent));color:#fff;border:none;border-radius:10px;font-size:1rem;font-weight:600;font-family:inherit;cursor:pointer;margin-bottom:12px}
+.calc-btn:active{transform:scale(0.98);opacity:0.9}
+.result{display:none}.result.visible{display:block}
+.result-main{text-align:center;padding:6px 0 10px}
+.result-value{font-size:2.6rem;font-weight:700;color:var(--accent);line-height:1.1}
+.result-unit{font-size:0.9rem;color:var(--text2);margin-top:2px}
+.result-details{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.detail-box{background:var(--bg);border-radius:8px;padding:10px;text-align:center}
 .detail-box.full-width{grid-column:1/-1}
-.detail-val{font-size:1.3rem;font-weight:700;color:var(--text)}
-.detail-label{font-size:0.72rem;color:var(--text2);margin-top:2px;text-transform:uppercase;letter-spacing:0.04em}
-.wind-indicator{position:relative;width:160px;height:160px;margin:10px auto}
-.wind-indicator canvas{width:100%;height:100%}
-.info-card{font-size:0.8rem;color:var(--text2);line-height:1.6}
-.info-card b{color:var(--text);font-weight:500}
-.auth-overlay{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:1000}
-.auth-overlay.hidden{display:none}
-.auth-box{text-align:center;padding:32px 24px;max-width:340px;width:100%}
-.auth-box h1{font-size:1.5rem;margin-bottom:6px}
-.auth-box h1 span{color:var(--accent)}
-.auth-box p{color:var(--text2);font-size:0.85rem;margin-bottom:24px}
-.auth-box input[type="password"]{width:100%;background:var(--card);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:14px;font-size:1.05rem;font-family:inherit;outline:none;text-align:center;margin-bottom:12px;transition:border-color 0.2s}
-.auth-box input[type="password"]:focus{border-color:var(--accent)}
-.auth-box .auth-btn{width:100%;padding:14px;background:linear-gradient(135deg,var(--accent2),var(--accent));color:#fff;border:none;border-radius:10px;font-size:1rem;font-weight:600;font-family:inherit;cursor:pointer}
-.auth-error{color:var(--danger);font-size:0.82rem;margin-top:10px;min-height:1.2em}
-.app-content.locked{display:none}
-.error-msg{color:var(--danger);font-size:0.82rem;text-align:center;padding:8px 0;display:none}
-.beaufort-badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:0.75rem;font-weight:600;margin-top:6px}
+.detail-val{font-size:1.2rem;font-weight:700;color:var(--text)}
+.detail-label{font-size:0.7rem;color:var(--text2);margin-top:2px;text-transform:uppercase;letter-spacing:0.04em}
+.beaufort-badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:0.72rem;font-weight:600;margin-top:4px}
 .beaufort-0,.beaufort-1{background:#264653;color:#2a9d8f}
 .beaufort-2{background:#1a4a3a;color:#52b788}
 .beaufort-3{background:#2a4a30;color:#80c060}
@@ -61,17 +43,27 @@ button.calc-btn:active{transform:scale(0.98);opacity:0.9}
 .beaufort-5{background:#4a3a1a;color:#e0a030}
 .beaufort-6{background:#4a2a1a;color:#e07030}
 .beaufort-7{background:#4a1a1a;color:#e04040}
-.mode-tabs{display:flex;gap:4px;margin-bottom:14px;background:var(--bg);border-radius:10px;padding:3px}
-.mode-tab{flex:1;padding:11px 8px;text-align:center;font-size:0.85rem;font-weight:600;color:var(--text2);border:none;background:none;border-radius:8px;cursor:pointer;font-family:inherit;transition:all 0.2s}
-.mode-tab.active{background:var(--accent2);color:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.3)}
-.mode-content{display:none}
-.mode-content.active{display:block}
-.dir-toggle{display:flex;gap:6px;margin-top:6px}
-.dir-btn{flex:1;padding:10px;text-align:center;font-size:0.85rem;font-weight:500;color:var(--text2);background:var(--bg);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-family:inherit;transition:all 0.2s}
-.dir-btn.active{background:var(--accent2);color:#fff;border-color:var(--accent2)}
-.warn-badge{display:block;padding:8px 12px;border-radius:8px;font-size:0.78rem;font-weight:500;background:#3a3520;color:var(--warn);text-align:center;margin-bottom:14px}
-.wind-from-label{font-size:1.1rem;font-weight:600;color:var(--text);margin-top:4px}
-@media(min-width:600px){.container{padding:24px}header{padding:32px 0 16px}header h1{font-size:1.6rem}.result-value{font-size:3.2rem}}
+.error-msg{color:var(--danger);font-size:0.82rem;text-align:center;padding:6px 0;display:none}
+.auth-overlay{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:1000}
+.auth-overlay.hidden{display:none}
+.auth-box{text-align:center;padding:32px 24px;max-width:340px;width:100%}
+.auth-box h1{font-size:1.5rem;margin-bottom:6px}
+.auth-box h1 span{color:var(--accent)}
+.auth-box p{color:var(--text2);font-size:0.85rem;margin-bottom:24px}
+.auth-box input[type="password"]{width:100%;background:var(--card);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:14px;font-size:1.05rem;font-family:inherit;outline:none;text-align:center;margin-bottom:12px}
+.auth-box input[type="password"]:focus{border-color:var(--accent)}
+.auth-box .auth-btn{width:100%;padding:14px;background:linear-gradient(135deg,var(--accent2),var(--accent));color:#fff;border:none;border-radius:10px;font-size:1rem;font-weight:600;font-family:inherit;cursor:pointer}
+.auth-error{color:var(--danger);font-size:0.82rem;margin-top:10px;min-height:1.2em}
+.app-content.locked{display:none}
+.compass-wrap{position:relative;width:220px;height:220px;margin:8px auto;touch-action:none}
+.compass-wrap canvas{width:100%;height:100%}
+.compass-val{text-align:center;font-size:0.85rem;color:var(--accent);font-weight:600;margin-top:4px}
+.wind-display{position:relative;width:180px;height:180px;margin:8px auto}
+.wind-display canvas{width:100%;height:100%}
+.info-card{font-size:0.78rem;color:var(--text2);line-height:1.6}
+.info-card b{color:var(--text);font-weight:500}
+.formula-box{background:var(--bg);border-radius:8px;padding:10px 12px;margin:8px 0;font-family:monospace;font-size:0.78rem;color:var(--accent);line-height:1.5}
+@media(min-width:600px){.container{padding:24px}header h1{font-size:1.5rem}.result-value{font-size:3rem}}
 </style>
 </head>
 <body>
@@ -87,201 +79,302 @@ button.calc-btn:active{transform:scale(0.98);opacity:0.9}
 <div class="container app-content locked" id="app-content">
 <header>
 <h1><span>Wind</span>Wizard</h1>
-<p>Розрахунок вітру для БПЛА</p>
+<p>Визначення істинного вітру для БПЛА</p>
 </header>
+
 <div class="card">
-<div class="card-title">Режим розрахунку</div>
-<div class="mode-tabs">
-<button class="mode-tab active" data-mode="crosswind">Бокова складова</button>
-<button class="mode-tab" data-mode="fullwind">Повний вектор</button>
-</div>
-<div class="input-group">
-<label>Повітряна швидкість (TAS) <small>(м/с)</small></label>
-<input type="number" id="airspeed" inputmode="decimal" placeholder="напр. 25" step="any" min="0">
-</div>
-<div class="input-group">
-<label>Курс (Heading) <small>(градуси)</small></label>
-<input type="number" id="heading" inputmode="decimal" placeholder="напр. 90" step="any" min="0" max="360">
-</div>
-<div id="mode-crosswind" class="mode-content active">
+<div class="card-title">Встановлений вітер</div>
 <div class="row">
 <div class="input-group">
-<label>Зміщення <small>(м)</small></label>
-<input type="number" id="displacement" inputmode="decimal" placeholder="напр. 50" step="any" min="0">
+<label>Напрямок <small>(звідки, &deg;)</small></label>
+<input type="number" id="set-wind-dir" inputmode="decimal" placeholder="270" step="any" min="0" max="360">
+</div>
+<div class="input-group">
+<label>Швидкість <small>(м/с)</small></label>
+<input type="number" id="set-wind-spd" inputmode="decimal" placeholder="5" step="any" min="0">
+</div>
+</div>
+</div>
+
+<div class="card">
+<div class="card-title">Зміщення (фактичне vs ІНС)</div>
+<div class="input-group">
+<label>Напрямок зміщення <small>(куди знесло відносно ІНС)</small></label>
+<div class="compass-wrap" id="compass-wrap">
+<canvas id="compass-canvas" width="440" height="440"></canvas>
+</div>
+<div class="compass-val" id="compass-val">090&deg; (Сх)</div>
+</div>
+<div class="row">
+<div class="input-group">
+<label>Відстань <small>(м)</small></label>
+<input type="number" id="offset-dist" inputmode="decimal" placeholder="200" step="any" min="0">
 </div>
 <div class="input-group">
 <label>Час <small>(сек)</small></label>
-<input type="number" id="time" inputmode="decimal" placeholder="напр. 30" step="any" min="0">
-</div>
-</div>
-<div class="input-group">
-<label>Напрямок зносу</label>
-<div class="dir-toggle">
-<button class="dir-btn active" data-dir="right">Вправо</button>
-<button class="dir-btn" data-dir="left">Вліво</button>
+<input type="number" id="offset-time" inputmode="decimal" placeholder="120" step="any" min="0">
 </div>
 </div>
 </div>
-<div id="mode-fullwind" class="mode-content">
-<div class="warn-badge">&#9888; Наближений розрахунок (дані ІНС без GPS)</div>
-<div class="input-group">
-<label>Ground Speed (ІНС) <small>(м/с)</small></label>
-<input type="number" id="gs" inputmode="decimal" placeholder="напр. 22" step="any" min="0">
-</div>
-<div class="input-group">
-<label>Ground Track (ІНС) <small>(градуси)</small></label>
-<input type="number" id="track" inputmode="decimal" placeholder="напр. 95" step="any" min="0" max="360">
-</div>
-</div>
-</div>
-<button class="calc-btn" id="calc-btn">Розрахувати вітер</button>
+
+<button class="calc-btn" id="calc-btn">Розрахувати істинний вітер</button>
 <div class="error-msg" id="error"></div>
+
 <div class="result" id="result">
 <div class="card">
-<div class="card-title" id="result-title">Результат</div>
+<div class="card-title">Істинний вітер</div>
 <div class="result-main">
-<div class="wind-indicator">
-<canvas id="wind-canvas" width="320" height="320"></canvas>
-</div>
+<div class="wind-display"><canvas id="result-canvas" width="360" height="360"></canvas></div>
 <div class="result-value" id="wind-speed">—</div>
 <div class="result-unit">м/с</div>
-<div class="wind-from-label" id="wind-from"></div>
+<div style="font-size:1rem;font-weight:600;color:var(--text);margin-top:4px" id="wind-dir-label"></div>
 <div id="beaufort-container"></div>
 </div>
 <div class="result-details" id="result-details"></div>
 </div>
 </div>
+
 <div class="card info-card">
-<div class="card-title">Як використовувати</div>
+<div class="card-title">Як це працює</div>
 <p>
-<b>Бокова складова</b> — точний розрахунок бокового вітру.<br>
-Введіть TAS, курс, зміщення від курсу ІНС (метри) та час. Оберіть напрямок зносу (вправо/вліво).<br><br>
-<b>Повний вектор</b> — наближений розрахунок повного вітру.<br>
-Введіть TAS, курс, Ground Speed та Ground Track з ІНС. Результат наближений через дрейф ІНС (краще на коротких відрізках).<br><br>
-Формула: Вітер = Вектор руху по землі - Вектор руху в повітрі.
+<b>ІНС</b> рахує позицію на основі TAS + встановленого вітру.<br>
+Якщо вітер неточний — позиція ІНС дрейфує від реальної.<br>
+Коригуючи позицію через камеру, ви отримуєте вектор похибки.
+</p>
+<div class="formula-box">
+Істинний вітер = Встановлений вітер + Зміщення / Час
+</div>
+<p>
+<b>1.</b> Введіть поточний встановлений вітер (напрямок + швидкість).<br>
+<b>2.</b> Стрілкою на компасі покажіть куди літак насправді був відносно позиції ІНС.<br>
+<b>3.</b> Введіть відстань зміщення (м) і час між оновленнями координат (сек).
 </p>
 </div>
 </div>
+
 <script>
 (function(){
 var $=function(id){return document.getElementById(id)};
+
+/* Auth */
 var PASS_HASH='1cb8e5aeb6ab5f2019eda1f835c834c100c8ad9837d47ad7744f5286842fce58';
-function sha256(text){return crypto.subtle.digest('SHA-256',new TextEncoder().encode(text)).then(function(buf){return Array.from(new Uint8Array(buf)).map(function(x){return x.toString(16).padStart(2,'0')}).join('')})}
-function unlockApp(){$('auth-overlay').classList.add('hidden');$('app-content').classList.remove('locked')}
-if(sessionStorage.getItem('ww_auth')==='1')unlockApp();
-function tryAuth(){var pwd=$('auth-password').value;if(!pwd)return;sha256(pwd).then(function(hash){if(hash===PASS_HASH){sessionStorage.setItem('ww_auth','1');unlockApp()}else{$('auth-error').textContent='Невірний пароль';$('auth-password').value='';$('auth-password').focus()}})}
+function sha256(t){return crypto.subtle.digest('SHA-256',new TextEncoder().encode(t)).then(function(b){return Array.from(new Uint8Array(b)).map(function(x){return x.toString(16).padStart(2,'0')}).join('')})}
+function unlock(){$('auth-overlay').classList.add('hidden');$('app-content').classList.remove('locked')}
+if(sessionStorage.getItem('ww_auth')==='1')unlock();
+function tryAuth(){var p=$('auth-password').value;if(!p)return;sha256(p).then(function(h){if(h===PASS_HASH){sessionStorage.setItem('ww_auth','1');unlock()}else{$('auth-error').textContent='Невірний пароль';$('auth-password').value='';$('auth-password').focus()}})}
 $('auth-btn').addEventListener('click',tryAuth);
 $('auth-password').addEventListener('keydown',function(e){if(e.key==='Enter')tryAuth()});
-var currentMode='crosswind';
-document.querySelectorAll('.mode-tab').forEach(function(tab){tab.addEventListener('click',function(){document.querySelectorAll('.mode-tab').forEach(function(t){t.classList.remove('active')});document.querySelectorAll('.mode-content').forEach(function(c){c.classList.remove('active')});tab.classList.add('active');currentMode=tab.dataset.mode;$('mode-'+currentMode).classList.add('active');$('result').classList.remove('visible')})});
-document.querySelectorAll('.dir-btn').forEach(function(btn){btn.addEventListener('click',function(){document.querySelectorAll('.dir-btn').forEach(function(b){b.classList.remove('active')});btn.classList.add('active')})});
-function getBeaufort(ms){var scale=[[0.3,0,'Штиль'],[1.5,1,'Тихий'],[3.3,2,'Легкий'],[5.5,3,'Слабкий'],[8.0,4,'Помірний'],[10.8,5,'Свіжий'],[13.9,6,'Сильний'],[Infinity,7,'Дуже сильний']];for(var i=0;i<scale.length;i++){if(ms<scale[i][0])return{num:scale[i][1],name:scale[i][2]}}return{num:7,name:'Дуже сильний'}}
-function compassLabel(deg){var dirs=['Пн','ПнСх','Сх','ПдСх','Пд','ПдЗх','Зх','ПнЗх'];return dirs[Math.round(deg/45)%8]}
-function normDeg(d){return((d%360)+360)%360}
+
+/* Helpers */
 function degToRad(d){return d*Math.PI/180}
-function showError(msg){$('error').textContent=msg;$('error').style.display='block';$('result').classList.remove('visible')}
+function radToDeg(r){return r*180/Math.PI}
+function normDeg(d){return((d%360)+360)%360}
+function compassLabel(deg){
+  deg=normDeg(deg);
+  var dirs=['Пн','ПнСх','Сх','ПдСх','Пд','ПдЗх','Зх','ПнЗх'];
+  return dirs[Math.round(deg/45)%8];
+}
+function getBeaufort(ms){
+  var s=[[0.3,0,'Штиль'],[1.5,1,'Тихий'],[3.3,2,'Легкий'],[5.5,3,'Слабкий'],[8.0,4,'Помірний'],[10.8,5,'Свіжий'],[13.9,6,'Сильний'],[1e9,7,'Дуже сильний']];
+  for(var i=0;i<s.length;i++){if(ms<s[i][0])return{num:s[i][1],name:s[i][2]}}
+  return{num:7,name:'Дуже сильний'};
+}
+
+/* Compass selector */
+var offsetDir=90;
+var compassCanvas=$('compass-canvas');
+var compassCtx=compassCanvas.getContext('2d');
+
+function drawCompassSelector(){
+  var w=compassCanvas.width,h=compassCanvas.height,cx=w/2,cy=h/2,r=190;
+  compassCtx.clearRect(0,0,w,h);
+  /* ring */
+  compassCtx.beginPath();compassCtx.arc(cx,cy,r,0,Math.PI*2);
+  compassCtx.fillStyle='#0f1923';compassCtx.fill();
+  compassCtx.strokeStyle='#2a3f50';compassCtx.lineWidth=3;compassCtx.stroke();
+  /* ticks */
+  for(var i=0;i<360;i+=10){
+    var a=degToRad(i);var inner=i%30===0?r-18:r-10;
+    compassCtx.strokeStyle=i%30===0?'#4a6a7a':'#2a3f50';
+    compassCtx.lineWidth=i%30===0?2:1;
+    compassCtx.beginPath();
+    compassCtx.moveTo(cx+Math.sin(a)*inner,cy-Math.cos(a)*inner);
+    compassCtx.lineTo(cx+Math.sin(a)*(r-2),cy-Math.cos(a)*(r-2));
+    compassCtx.stroke();
+  }
+  /* labels */
+  var cards=[['Пн',0],['Сх',90],['Пд',180],['Зх',270]];
+  compassCtx.font='600 16px -apple-system,sans-serif';compassCtx.textAlign='center';compassCtx.textBaseline='middle';
+  for(var j=0;j<cards.length;j++){
+    var a2=degToRad(cards[j][1]);
+    compassCtx.fillStyle='#8899a6';
+    compassCtx.fillText(cards[j][0],cx+Math.sin(a2)*(r-34),cy-Math.cos(a2)*(r-34));
+  }
+  /* center dot */
+  compassCtx.beginPath();compassCtx.arc(cx,cy,5,0,Math.PI*2);
+  compassCtx.fillStyle='#2a3f50';compassCtx.fill();
+  /* arrow */
+  var aa=degToRad(offsetDir);
+  var arrowLen=r-50;
+  var ax=cx+Math.sin(aa)*arrowLen;
+  var ay=cy-Math.cos(aa)*arrowLen;
+  compassCtx.strokeStyle='#00b4d8';compassCtx.lineWidth=4;compassCtx.lineCap='round';
+  compassCtx.beginPath();compassCtx.moveTo(cx,cy);compassCtx.lineTo(ax,ay);compassCtx.stroke();
+  /* arrowhead */
+  var ha=Math.atan2(ay-cy,ax-cx);
+  compassCtx.beginPath();
+  compassCtx.moveTo(ax,ay);
+  compassCtx.lineTo(ax-16*Math.cos(ha-0.35),ay-16*Math.sin(ha-0.35));
+  compassCtx.lineTo(ax-16*Math.cos(ha+0.35),ay-16*Math.sin(ha+0.35));
+  compassCtx.closePath();
+  compassCtx.fillStyle='#00b4d8';compassCtx.fill();
+  /* degree text in center */
+  compassCtx.font='700 22px -apple-system,sans-serif';compassCtx.textAlign='center';compassCtx.textBaseline='middle';
+  compassCtx.fillStyle='#00b4d8';
+  compassCtx.fillText(Math.round(normDeg(offsetDir))+'°',cx,cy+r+28);
+}
+
+function getAngleFromEvent(e){
+  var rect=compassCanvas.getBoundingClientRect();
+  var scaleX=compassCanvas.width/rect.width;
+  var scaleY=compassCanvas.height/rect.height;
+  var ex,ey;
+  if(e.touches){ex=e.touches[0].clientX;ey=e.touches[0].clientY}
+  else{ex=e.clientX;ey=e.clientY}
+  var x=(ex-rect.left)*scaleX-compassCanvas.width/2;
+  var y=(ey-rect.top)*scaleY-compassCanvas.height/2;
+  var angle=radToDeg(Math.atan2(x,-y));
+  return normDeg(angle);
+}
+
+var dragging=false;
+compassCanvas.addEventListener('mousedown',function(e){dragging=true;offsetDir=getAngleFromEvent(e);updateCompass()});
+compassCanvas.addEventListener('mousemove',function(e){if(dragging){offsetDir=getAngleFromEvent(e);updateCompass()}});
+document.addEventListener('mouseup',function(){dragging=false});
+compassCanvas.addEventListener('touchstart',function(e){e.preventDefault();dragging=true;offsetDir=getAngleFromEvent(e);updateCompass()},{passive:false});
+compassCanvas.addEventListener('touchmove',function(e){e.preventDefault();if(dragging){offsetDir=getAngleFromEvent(e);updateCompass()}},{passive:false});
+compassCanvas.addEventListener('touchend',function(){dragging=false});
+
+function updateCompass(){
+  drawCompassSelector();
+  $('compass-val').textContent=Math.round(normDeg(offsetDir))+'° ('+compassLabel(offsetDir)+')';
+}
+drawCompassSelector();
+
+/* Result display */
+function drawResult(setDir,setSpd,trueDir,trueSpd){
+  var canvas=$('result-canvas');
+  var ctx=canvas.getContext('2d');
+  var w=canvas.width,h=canvas.height,cx=w/2,cy=h/2,r=150;
+  ctx.clearRect(0,0,w,h);
+  ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);
+  ctx.fillStyle='#0f1923';ctx.fill();ctx.strokeStyle='#2a3f50';ctx.lineWidth=2;ctx.stroke();
+  /* cardinals */
+  var cards=[['Пн',0],['Сх',90],['Пд',180],['Зх',270]];
+  ctx.font='600 13px -apple-system,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
+  for(var i=0;i<cards.length;i++){
+    var a=degToRad(cards[i][1]);
+    ctx.fillStyle='#4a6a7a';
+    ctx.fillText(cards[i][0],cx+Math.sin(a)*(r-18),cy-Math.cos(a)*(r-18));
+  }
+  /* max speed for scaling */
+  var maxSpd=Math.max(setSpd,trueSpd,1);
+  /* set wind arrow (dim) — wind blows FROM setDir, so arrow points opposite */
+  var sa=degToRad(normDeg(setDir+180));
+  var sLen=40+(setSpd/maxSpd)*70;
+  var sx=cx+Math.sin(sa)*sLen,sy=cy-Math.cos(sa)*sLen;
+  ctx.strokeStyle='#4a5f70';ctx.lineWidth=2.5;ctx.setLineDash([6,4]);
+  ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(sx,sy);ctx.stroke();ctx.setLineDash([]);
+  var sha2=Math.atan2(sy-cy,sx-cx);
+  ctx.beginPath();ctx.moveTo(sx,sy);
+  ctx.lineTo(sx-10*Math.cos(sha2-0.35),sy-10*Math.sin(sha2-0.35));
+  ctx.lineTo(sx-10*Math.cos(sha2+0.35),sy-10*Math.sin(sha2+0.35));
+  ctx.closePath();ctx.fillStyle='#4a5f70';ctx.fill();
+  ctx.font='500 10px -apple-system,sans-serif';ctx.fillStyle='#4a5f70';
+  ctx.fillText('задано',cx+Math.sin(sa)*(sLen+16),cy-Math.cos(sa)*(sLen+16));
+  /* true wind arrow */
+  var ta=degToRad(normDeg(trueDir+180));
+  var tLen=40+(trueSpd/maxSpd)*70;
+  var tx=cx+Math.sin(ta)*tLen,ty=cy-Math.cos(ta)*tLen;
+  ctx.strokeStyle='#00b4d8';ctx.lineWidth=3.5;
+  ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(tx,ty);ctx.stroke();
+  var tha=Math.atan2(ty-cy,tx-cx);
+  ctx.beginPath();ctx.moveTo(tx,ty);
+  ctx.lineTo(tx-13*Math.cos(tha-0.35),ty-13*Math.sin(tha-0.35));
+  ctx.lineTo(tx-13*Math.cos(tha+0.35),ty-13*Math.sin(tha+0.35));
+  ctx.closePath();ctx.fillStyle='#00b4d8';ctx.fill();
+  ctx.font='600 11px -apple-system,sans-serif';ctx.fillStyle='#00b4d8';
+  ctx.fillText('істинний',cx+Math.sin(ta)*(tLen+18),cy-Math.cos(ta)*(tLen+18));
+}
+
+/* Calculate */
+function showError(m){$('error').textContent=m;$('error').style.display='block';$('result').classList.remove('visible')}
 function clearError(){$('error').style.display='none'}
-function drawCompass(headingDeg,windFromDeg,windSpeed,modeIsFull){
-var canvas=$('wind-canvas');var ctx=canvas.getContext('2d');var w=canvas.width;var h=canvas.height;var cx=w/2;var cy=h/2;var r=140;
-ctx.clearRect(0,0,w,h);
-ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.fillStyle='#0f1923';ctx.fill();ctx.strokeStyle='#2a3f50';ctx.lineWidth=2;ctx.stroke();
-ctx.strokeStyle='#1e3040';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(cx,cy-r+10);ctx.lineTo(cx,cy+r-10);ctx.moveTo(cx-r+10,cy);ctx.lineTo(cx+r-10,cy);ctx.stroke();
-var cardinals=[['Пн',0],['Сх',90],['Пд',180],['Зх',270]];
-ctx.font='600 12px -apple-system,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
-for(var i=0;i<cardinals.length;i++){var a=degToRad(cardinals[i][1]);var lx=cx+Math.sin(a)*(r-18);var ly=cy-Math.cos(a)*(r-18);ctx.fillStyle='#4a6a7a';ctx.fillText(cardinals[i][0],lx,ly)}
-var ha=degToRad(headingDeg);var hLen=80;
-ctx.strokeStyle='#4a6a7a';ctx.lineWidth=2.5;ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(cx+Math.sin(ha)*hLen,cy-Math.cos(ha)*hLen);ctx.stroke();
-var hx=cx+Math.sin(ha)*hLen;var hy=cy-Math.cos(ha)*hLen;var hha=Math.atan2(hy-cy,hx-cx);
-ctx.beginPath();ctx.moveTo(hx,hy);ctx.lineTo(hx-10*Math.cos(hha-0.4),hy-10*Math.sin(hha-0.4));ctx.moveTo(hx,hy);ctx.lineTo(hx-10*Math.cos(hha+0.4),hy-10*Math.sin(hha+0.4));ctx.stroke();
-ctx.fillStyle='#4a6a7a';ctx.font='500 10px -apple-system,sans-serif';
-var hlx=cx+Math.sin(ha)*(hLen+16);var hly=cy-Math.cos(ha)*(hLen+16);ctx.fillText('КУРС',hlx,hly);
-var wa=degToRad(windFromDeg+180);
-var arrowLen=35+Math.min(windSpeed*4,55);
-var wx=cx+Math.sin(wa)*arrowLen;var wy=cy-Math.cos(wa)*arrowLen;
-ctx.strokeStyle='#00b4d8';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(wx,wy);ctx.stroke();
-var wha=Math.atan2(wy-cy,wx-cx);
-ctx.beginPath();ctx.moveTo(wx,wy);ctx.lineTo(wx-12*Math.cos(wha-0.4),wy-12*Math.sin(wha-0.4));ctx.moveTo(wx,wy);ctx.lineTo(wx-12*Math.cos(wha+0.4),wy-12*Math.sin(wha+0.4));ctx.stroke();
-ctx.fillStyle='#00b4d8';ctx.font='600 10px -apple-system,sans-serif';
-var wlx=cx+Math.sin(wa)*(arrowLen+16);var wly=cy-Math.cos(wa)*(arrowLen+16);ctx.fillText('ВІТЕР',wlx,wly);
-}
+
 function calculate(){
-clearError();
-var tas=parseFloat($('airspeed').value);
-if(!tas||tas<=0){showError('Введіть повітряну швидкість');return}
-var hdg=parseFloat($('heading').value);
-if(isNaN(hdg)||hdg<0){showError('Введіть курс');return}
-hdg=normDeg(hdg);
-if(currentMode==='crosswind'){
-var disp=parseFloat($('displacement').value);
-var time=parseFloat($('time').value);
-if(!disp||disp<0){showError('Введіть зміщення');return}
-if(!time||time<=0){showError('Введіть час');return}
-var crosswind=disp/time;
-var driftAngle=Math.atan2(crosswind,tas)*(180/Math.PI);
-var dirRight=document.querySelector('.dir-btn.active').dataset.dir==='right';
-var windFromDeg=dirRight?normDeg(hdg+90):normDeg(hdg-90);
-$('result-title').textContent='Бокова складова вітру';
-$('wind-speed').textContent=crosswind.toFixed(1);
-$('wind-from').textContent='з '+compassLabel(windFromDeg)+' ('+Math.round(windFromDeg)+'\u00B0)';
-var bf=getBeaufort(crosswind);
-$('beaufort-container').innerHTML='<span class="beaufort-badge beaufort-'+bf.num+'">'+bf.name+' ('+bf.num+' бал.)</span>';
-var detailsHtml='<div class="detail-box"><div class="detail-val">'+(crosswind*3.6).toFixed(1)+'</div><div class="detail-label">км/год</div></div>';
-detailsHtml+='<div class="detail-box"><div class="detail-val">'+(crosswind*1.944).toFixed(1)+'</div><div class="detail-label">вузли</div></div>';
-detailsHtml+='<div class="detail-box"><div class="detail-val">'+crosswind.toFixed(2)+'</div><div class="detail-label">швидкість зносу м/с</div></div>';
-detailsHtml+='<div class="detail-box"><div class="detail-val">'+driftAngle.toFixed(1)+'\u00B0</div><div class="detail-label">кут зносу</div></div>';
-var hint;
-if(crosswind<1)hint='Корекція не потрібна';
-else if(crosswind<3)hint='Незначна корекція курсу';
-else if(crosswind<6)hint='Враховуйте знос при навігації';
-else if(crosswind<10)hint='Значний вплив \u2014 корегуйте курс';
-else hint='Небезпечний вітер для малих БПЛА';
-detailsHtml+='<div class="detail-box full-width"><div class="detail-val">'+hint+'</div><div class="detail-label">рекомендація</div></div>';
-$('result-details').innerHTML=detailsHtml;
-drawCompass(hdg,windFromDeg,crosswind,false);
-}else{
-var gs=parseFloat($('gs').value);
-var track=parseFloat($('track').value);
-if(!gs||gs<0){showError('Введіть Ground Speed');return}
-if(isNaN(track)||track<0){showError('Введіть Ground Track');return}
-track=normDeg(track);
-var airX=tas*Math.sin(degToRad(hdg));
-var airY=tas*Math.cos(degToRad(hdg));
-var gndX=gs*Math.sin(degToRad(track));
-var gndY=gs*Math.cos(degToRad(track));
-var windX=gndX-airX;
-var windY=gndY-airY;
-var windSpd=Math.sqrt(windX*windX+windY*windY);
-var windTo=normDeg(Math.atan2(windX,windY)*180/Math.PI);
-var windFrom=normDeg(windTo+180);
-var relWind=degToRad(windFrom-hdg);
-var headwind=windSpd*Math.cos(relWind);
-var crosswindComp=windSpd*Math.sin(relWind);
-$('result-title').textContent='Повний вектор вітру (наближено)';
-$('wind-speed').textContent=windSpd.toFixed(1);
-$('wind-from').textContent='з '+compassLabel(windFrom)+' ('+Math.round(windFrom)+'\u00B0)';
-var bf2=getBeaufort(windSpd);
-$('beaufort-container').innerHTML='<span class="beaufort-badge beaufort-'+bf2.num+'">'+bf2.name+' ('+bf2.num+' бал.)</span>';
-var d2='<div class="detail-box"><div class="detail-val">'+(windSpd*3.6).toFixed(1)+'</div><div class="detail-label">км/год</div></div>';
-d2+='<div class="detail-box"><div class="detail-val">'+(windSpd*1.944).toFixed(1)+'</div><div class="detail-label">вузли</div></div>';
-var hwLabel=headwind>=0?'зустрічний':'попутний';
-d2+='<div class="detail-box"><div class="detail-val">'+Math.abs(headwind).toFixed(1)+'</div><div class="detail-label">'+hwLabel+' м/с</div></div>';
-var cwSide=crosswindComp>=0?'справа':'зліва';
-d2+='<div class="detail-box"><div class="detail-val">'+Math.abs(crosswindComp).toFixed(1)+'</div><div class="detail-label">боковий '+cwSide+' м/с</div></div>';
-var hint2;
-if(windSpd<1)hint2='Вітер мінімальний';
-else if(windSpd<3)hint2='Слабкий вплив на політ';
-else if(windSpd<6)hint2='Помірний вплив \u2014 враховуйте при навігації';
-else if(windSpd<10)hint2='Сильний вплив \u2014 корегуйте курс';
-else hint2='Небезпечний вітер для малих БПЛА';
-d2+='<div class="detail-box full-width"><div class="detail-val">'+hint2+'</div><div class="detail-label">рекомендація</div></div>';
-$('result-details').innerHTML=d2;
-drawCompass(hdg,windFrom,windSpd,true);
+  clearError();
+  var setDir=parseFloat($('set-wind-dir').value);
+  var setSpd=parseFloat($('set-wind-spd').value);
+  if(isNaN(setDir)){showError('Введіть напрямок встановленого вітру');return}
+  if(isNaN(setSpd)||setSpd<0){showError('Введіть швидкість встановленого вітру');return}
+  setDir=normDeg(setDir);
+  var dist=parseFloat($('offset-dist').value);
+  var time=parseFloat($('offset-time').value);
+  if(!dist||dist<0){showError('Введіть відстань зміщення');return}
+  if(!time||time<=0){showError('Введіть час');return}
+
+  /* Wind blows FROM setDir, so the wind velocity vector points opposite */
+  var setWindTo=normDeg(setDir+180);
+  var swx=setSpd*Math.sin(degToRad(setWindTo));
+  var swy=setSpd*Math.cos(degToRad(setWindTo));
+
+  /* Offset: direction offsetDir is where the aircraft actually was relative to INS position */
+  /* This means the wind carried it in that direction, so correction vector points that way */
+  var corrSpd=dist/time;
+  var cx2=corrSpd*Math.sin(degToRad(offsetDir));
+  var cy2=corrSpd*Math.cos(degToRad(offsetDir));
+
+  /* True wind velocity vector */
+  var twx=swx+cx2;
+  var twy=swy+cy2;
+  var trueSpd=Math.sqrt(twx*twx+twy*twy);
+  var trueTo=normDeg(radToDeg(Math.atan2(twx,twy)));
+  var trueFrom=normDeg(trueTo+180);
+
+  /* Display */
+  $('result').classList.add('visible');
+  $('wind-speed').textContent=trueSpd.toFixed(1);
+  $('wind-dir-label').textContent='з '+compassLabel(trueFrom)+' ('+Math.round(trueFrom)+'°)';
+  var bf=getBeaufort(trueSpd);
+  $('beaufort-container').innerHTML='<span class="beaufort-badge beaufort-'+bf.num+'">'+bf.name+' ('+bf.num+' бал.)</span>';
+
+  var diffSpd=trueSpd-setSpd;
+  var diffDir=normDeg(trueFrom-setDir);
+  if(diffDir>180)diffDir-=360;
+
+  var d='';
+  d+='<div class="detail-box"><div class="detail-val">'+(trueSpd*3.6).toFixed(1)+'</div><div class="detail-label">км/год</div></div>';
+  d+='<div class="detail-box"><div class="detail-val">'+(trueSpd*1.944).toFixed(1)+'</div><div class="detail-label">вузли</div></div>';
+  d+='<div class="detail-box"><div class="detail-val">'+Math.round(trueFrom)+'°</div><div class="detail-label">напрямок (звідки)</div></div>';
+  d+='<div class="detail-box"><div class="detail-val">'+corrSpd.toFixed(1)+'</div><div class="detail-label">корекція м/с</div></div>';
+  d+='<div class="detail-box"><div class="detail-val">'+(diffSpd>=0?'+':'')+diffSpd.toFixed(1)+' м/с</div><div class="detail-label">різниця швидкості</div></div>';
+  d+='<div class="detail-box"><div class="detail-val">'+(diffDir>=0?'+':'')+Math.round(diffDir)+'°</div><div class="detail-label">різниця напрямку</div></div>';
+
+  var hint;
+  if(Math.abs(diffSpd)<0.5&&Math.abs(diffDir)<5)hint='Встановлений вітер майже точний';
+  else if(trueSpd<1)hint='Вітер мінімальний';
+  else hint='Встановіть вітер: '+Math.round(trueFrom)+'° / '+trueSpd.toFixed(1)+' м/с';
+  d+='<div class="detail-box full-width"><div class="detail-val">'+hint+'</div><div class="detail-label">рекомендація</div></div>';
+  $('result-details').innerHTML=d;
+
+  drawResult(setDir,setSpd,trueFrom,trueSpd);
+  $('result').scrollIntoView({behavior:'smooth',block:'nearest'});
 }
-$('result').classList.add('visible');
-$('result').scrollIntoView({behavior:'smooth',block:'nearest'});
-}
+
 $('calc-btn').addEventListener('click',calculate);
-document.querySelectorAll('input[type="number"]').forEach(function(inp){inp.addEventListener('keydown',function(e){if(e.key==='Enter')calculate()})});
+document.querySelectorAll('input[type="number"]').forEach(function(inp){
+  inp.addEventListener('keydown',function(e){if(e.key==='Enter')calculate()});
+});
 })();
 </script>
 </body>
