@@ -63,6 +63,11 @@ input[type="number"]::placeholder{color:#4a5f70}
 .info-card{font-size:0.78rem;color:var(--text2);line-height:1.6}
 .info-card b{color:var(--text);font-weight:500}
 .formula-box{background:var(--bg);border-radius:8px;padding:10px 12px;margin:8px 0;font-family:monospace;font-size:0.78rem;color:var(--accent);line-height:1.5}
+.timer-wrap{display:flex;gap:8px;align-items:flex-end}
+.timer-wrap .input-group{flex:1}
+.timer-btn{padding:11px 0;width:54px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text2);font-size:0.75rem;font-weight:600;font-family:inherit;cursor:pointer;text-align:center;transition:all 0.2s;margin-bottom:12px;flex-shrink:0}
+.timer-btn.running{border-color:var(--danger);color:var(--danger)}
+.timer-live{text-align:center;font-size:0.75rem;color:var(--text2);margin:-8px 0 10px;font-variant-numeric:tabular-nums;min-height:1.1em}
 @media(min-width:600px){.container{padding:24px}header h1{font-size:1.5rem}.result-value{font-size:3rem}}
 </style>
 </head>
@@ -105,16 +110,18 @@ input[type="number"]::placeholder{color:#4a5f70}
 </div>
 <div class="compass-val" id="compass-val">090&deg; (Сх)</div>
 </div>
-<div class="row">
 <div class="input-group">
 <label>Відстань <small>(м)</small></label>
 <input type="number" id="offset-dist" inputmode="decimal" placeholder="200" step="any" min="0">
 </div>
+<div class="timer-wrap">
 <div class="input-group">
 <label>Час <small>(сек)</small></label>
 <input type="number" id="offset-time" inputmode="decimal" placeholder="120" step="any" min="0">
 </div>
+<button type="button" class="timer-btn" id="timer-btn">Старт</button>
 </div>
+<div class="timer-live" id="timer-live"></div>
 </div>
 
 <button class="calc-btn" id="calc-btn">Розрахувати істинний вітер</button>
@@ -370,6 +377,28 @@ function calculate(){
   drawResult(setDir,setSpd,trueFrom,trueSpd);
   $('result').scrollIntoView({behavior:'smooth',block:'nearest'});
 }
+
+/* Timer */
+var timerStart=null;var timerInterval=null;
+function fmtTime(s){var m=Math.floor(s/60);var sec=s%60;return(m>0?m+'хв ':'')+sec+'с'}
+$('timer-btn').addEventListener('click',function(){
+  var btn=$('timer-btn');
+  if(timerStart===null){
+    timerStart=Date.now();
+    btn.textContent='Стоп';btn.classList.add('running');
+    timerInterval=setInterval(function(){
+      var elapsed=Math.round((Date.now()-timerStart)/1000);
+      $('timer-live').textContent=fmtTime(elapsed);
+    },500);
+  }else{
+    var elapsed=Math.round((Date.now()-timerStart)/1000);
+    clearInterval(timerInterval);
+    $('offset-time').value=elapsed;
+    $('timer-live').textContent='';
+    btn.textContent='Старт';btn.classList.remove('running');
+    timerStart=null;timerInterval=null;
+  }
+});
 
 $('calc-btn').addEventListener('click',calculate);
 document.querySelectorAll('input[type="number"]').forEach(function(inp){
